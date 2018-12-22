@@ -41,7 +41,6 @@
 #include "main.h"
 #include "stm32f1xx_it.h"
 #include "./led/bsp_led.h"   
-#include "./key/bsp_exti.h"
 
 /** @addtogroup STM32F1xx_HAL_Examples
   * @{
@@ -176,20 +175,7 @@ void SysTick_Handler(void)
 /*void PPP_IRQHandler(void)
 {
 }*/
-void KEY1_IRQHandler(void)
-{
-	HAL_GPIO_EXTI_IRQHandler(KEY1_INT_GPIO_PIN);
-}
 
-void KEY2_IRQHandler(void)
-{
-	HAL_GPIO_EXTI_IRQHandler(KEY2_INT_GPIO_PIN);
-}
-
-void HAL_PWR_PVDCallback(void)
-{
-  LED_RED;;
-}
 /**
   * @}
   */

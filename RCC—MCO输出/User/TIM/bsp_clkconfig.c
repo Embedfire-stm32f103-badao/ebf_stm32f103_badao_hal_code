@@ -12,7 +12,7 @@
   *            APB1 Prescaler                 = 2
   *            APB2 Prescaler                 = 1
   *            HSE Frequency(Hz)              = 8000000
-  *            HSE PREDIV1                    = 2
+  *            HSE PREDIV1                    = 1
   *            PLLMUL                         = 9
   *            Flash Latency(WS)              = 0
   * @param  None
@@ -60,7 +60,7 @@ void  HSE_SetSysClock(uint32_t pllmul)
   *            APB1 Prescaler                 = 2
   *            APB2 Prescaler                 = 1
   *            HSE Frequency(Hz)              = 8000000
-  *            HSE PREDIV1                    = 2
+  *            HSE PREDIV1                    = 1
   *            PLLMUL                         = 9
   *            Flash Latency(WS)              = 0
   * @param  None

@@ -42,7 +42,8 @@
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f1xx_hal.h"
 
-static void SystemClock_Config(void);
+void SystemClock_Config(uint32_t RCC_OSCILLATORTYPE,uint32_t RCC_PLL_MUL);
+void MCO_GPIO_Config(void);
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
