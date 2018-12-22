@@ -40,8 +40,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f1xx_it.h"
-#include "./led/bsp_led.h"   
-#include "./key/bsp_exti.h"
+#include "./can/bsp_can.h"
+
+extern __IO uint32_t flag;		 //用于标志是否接收到数据，在中断函数中赋值
 
 /** @addtogroup STM32F1xx_HAL_Examples
   * @{
@@ -176,20 +177,46 @@ void SysTick_Handler(void)
 /*void PPP_IRQHandler(void)
 {
 }*/
-void KEY1_IRQHandler(void)
+void CAN_RX_IRQHandler(void)
 {
-	HAL_GPIO_EXTI_IRQHandler(KEY1_INT_GPIO_PIN);
+	HAL_CAN_IRQHandler(&Can_Handle);
 }
 
-void KEY2_IRQHandler(void)
+void CAN2_TX_IRQHandler(void)
 {
-	HAL_GPIO_EXTI_IRQHandler(KEY2_INT_GPIO_PIN);
+	HAL_CAN_IRQHandler(&Can_Handle);
 }
 
-void HAL_PWR_PVDCallback(void)
+/**
+  * @brief  CAN接收完成中断(非阻塞) 
+  * @param  hcan: CAN句柄指针
+  * @retval 无
+  */
+void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
 {
-  LED_RED;;
+	/* 比较ID是否为0x1314 */ 
+	if((hcan->pRxMsg->ExtId==0x1314) && (hcan->pRxMsg->IDE==CAN_ID_EXT) && (hcan->pRxMsg->DLC==8) )
+	{
+		flag = 1; //接收成功  
+	}
+	else
+	{
+		flag = 0; //接收失败
+	}
+	/* 准备中断接收 */
+	HAL_CAN_Receive_IT(&Can_Handle, CAN_FIFO0);
 }
+/**
+  * @brief  CAN错误回调函数
+  * @param  hcan: CAN句柄指针
+  * @retval 无
+  */
+void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
+{
+	printf("\r\nCAN出错\r\n");
+}
+/*
+
 /**
   * @}
   */

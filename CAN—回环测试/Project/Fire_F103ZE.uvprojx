@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>停止模式</TargetName>
+      <TargetName>can</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060528::V5.06 update 5 (build 528)::ARMCC</pCCUsed>
@@ -646,9 +646,14 @@
               <FilePath>..\User\usart\bsp_debug_usart.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_exti.c</FileName>
+              <FileName>bsp_key.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\key\bsp_exti.c</FilePath>
+              <FilePath>..\User\key\bsp_key.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_can.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\can\bsp_can.c</FilePath>
             </File>
           </Files>
         </Group>
