@@ -646,9 +646,14 @@
               <FilePath>..\User\usart\bsp_debug_usart.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_exti.c</FileName>
+              <FileName>bsp_clkconfig.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\key\bsp_exti.c</FilePath>
+              <FilePath>..\User\TIM\bsp_clkconfig.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_mcooutput.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\TIM\bsp_mcooutput.c</FilePath>
             </File>
           </Files>
         </Group>
