@@ -72,7 +72,7 @@ void SystemClock_Config(void)
   /* Enable HSE Oscillator and activate PLL with HSE as source */
   oscinitstruct.OscillatorType  = RCC_OSCILLATORTYPE_HSE;
   oscinitstruct.HSEState        = RCC_HSE_ON;
-  oscinitstruct.HSEPredivValue  = RCC_HSE_PREDIV_DIV2;
+  oscinitstruct.HSEPredivValue  = RCC_HSE_PREDIV_DIV1;
   oscinitstruct.PLL.PLLState    = RCC_PLL_ON;
   oscinitstruct.PLL.PLLSource   = RCC_PLLSOURCE_HSE;
   oscinitstruct.PLL.PLLMUL      = RCC_PLL_MUL9;
@@ -89,7 +89,7 @@ void SystemClock_Config(void)
   clkinitstruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   clkinitstruct.APB2CLKDivider = RCC_HCLK_DIV1;
   clkinitstruct.APB1CLKDivider = RCC_HCLK_DIV2;  
-  if (HAL_RCC_ClockConfig(&clkinitstruct, FLASH_LATENCY_0)!= HAL_OK)
+  if (HAL_RCC_ClockConfig(&clkinitstruct, FLASH_LATENCY_2)!= HAL_OK)
   {
     /* Initialization Error */
     while(1); 
