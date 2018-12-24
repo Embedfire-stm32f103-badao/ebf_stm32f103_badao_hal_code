@@ -1,27 +1,17 @@
 #ifndef __INTERNAL_FLASH_H
 #define	__INTERNAL_FLASH_H
 
-#include "stm32f10x.h"
+#include "stm32f1xx.h"
 
-/* STM32大容量产品每页大小2KByte，中、小容量产品每页大小1KByte */
-#if defined (STM32F10X_HD) || defined (STM32F10X_HD_VL) || defined (STM32F10X_CL) || defined (STM32F10X_XL)
-  #define FLASH_PAGE_SIZE    ((uint16_t)0x800)	//2048
-#else
-  #define FLASH_PAGE_SIZE    ((uint16_t)0x400)	//1024
-#endif
-
-//写入的起始地址与结束地址
-#define WRITE_START_ADDR  ((uint32_t)0x08008000)
-#define WRITE_END_ADDR    ((uint32_t)0x0800C000)
-
-
-
-typedef enum 
-{
-	FAILED = 0, 
-  PASSED = !FAILED
-} TestStatus;
-
+/* Base address of the Flash sectors */ 
+#define ADDR_FLASH_SECTOR_0     ((uint32_t)0x08000000) /* Base address of Sector 0, 16 Kbytes   */
+#define ADDR_FLASH_SECTOR_1     ((uint32_t)0x08004000) /* Base address of Sector 1, 16 Kbytes   */
+#define ADDR_FLASH_SECTOR_2     ((uint32_t)0x08008000) /* Base address of Sector 2, 16 Kbytes   */
+#define ADDR_FLASH_SECTOR_3     ((uint32_t)0x0800C000) /* Base address of Sector 3, 16 Kbytes   */
+#define ADDR_FLASH_SECTOR_4     ((uint32_t)0x08010000) /* Base address of Sector 4, 64 Kbytes   */
+#define ADDR_FLASH_SECTOR_5     ((uint32_t)0x08020000) /* Base address of Sector 5, 128 Kbytes  */
+#define ADDR_FLASH_SECTOR_6     ((uint32_t)0x08040000) /* Base address of Sector 6, 128 Kbytes  */
+#define ADDR_FLASH_SECTOR_7     ((uint32_t)0x08060000) /* Base address of Sector 7, 128 Kbytes  */
 
 int InternalFlash_Test(void);
 
