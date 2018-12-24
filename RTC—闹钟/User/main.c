@@ -38,7 +38,9 @@ int main(void)
   LED_GPIO_Config();
  /* 串口初始化 */
   DEBUG_USART_Config();
-
+  
+  BEEP_GPIO_Config();
+    
   printf("\n\r这是一个RTC日历实验 \r\n");
 
 #ifdef USE_LCD_DISPLAY	
@@ -65,6 +67,9 @@ int main(void)
   else
 	{
     RTC_CalendarConfig();
+    /* 闹钟设置 */
+		RTC_AlarmSet();
+   
 		/* 检查是否电源复位 */
 		if (__HAL_RCC_GET_FLAG(RCC_FLAG_PORRST) != RESET)
 		{

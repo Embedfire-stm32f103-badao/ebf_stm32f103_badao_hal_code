@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>LCD</TargetName>
+      <TargetName>RTC闹钟</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060528::V5.06 update 5 (build 528)::ARMCC</pCCUsed>
@@ -664,6 +664,11 @@
               <FileName>bsp_rtc.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\rtc\bsp_rtc.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_beep.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\beep\bsp_beep.c</FilePath>
             </File>
           </Files>
         </Group>
