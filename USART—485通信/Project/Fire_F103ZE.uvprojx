@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>串口</TargetName>
+      <TargetName>485</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060528::V5.06 update 5 (build 528)::ARMCC</pCCUsed>
@@ -644,6 +644,16 @@
               <FileName>bsp_debug_usart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\usart\bsp_debug_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_485.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\485\bsp_485.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\key\bsp_key.c</FilePath>
             </File>
           </Files>
         </Group>

@@ -18,161 +18,147 @@
 #include <stdarg.h>
 
 
-static void Delay(__IO u32 nCount); 
+static void Delay(__IO uint32_t nCount); 
 
+UART_HandleTypeDef Uart2_Handle;
 
-/// 配置USART接收中断优先级
+/// 配置USART接收中断
 static void NVIC_Configuration(void)
-{
-    NVIC_InitTypeDef NVIC_InitStructure;
-    /* Configure the NVIC Preemption Priority Bits */
-    NVIC_PriorityGroupConfig(NVIC_PriorityGroup_0);
-
-    /* Enable the USARTy Interrupt */
-    NVIC_InitStructure.NVIC_IRQChannel = RS485_INT_IRQ; 
-    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority =1;
-    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-    NVIC_Init(&NVIC_InitStructure);
+{	
+	/* 配置抢占优先级的分组 */
+	HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_0);
+	/*中断设置，抢占优先级0，子优先级为0*/
+	HAL_NVIC_SetPriority(_485_INT_IRQ, 1 ,1);
+	HAL_NVIC_EnableIRQ(_485_INT_IRQ);
 }
 /*
- * 函数名：RS485_Config
+ * 函数名：_485_Config
  * 描述  ：USART GPIO 配置,工作模式配置
  * 输入  ：无
  * 输出  : 无
  * 调用  ：外部调用
  */
-void RS485_Config(void)
+void _485_Config(void)
 {
-	GPIO_InitTypeDef GPIO_InitStructure;
-	USART_InitTypeDef USART_InitStructure;
-
-	/* config USART clock */
-	RCC_APB2PeriphClockCmd(RS485_USART_RX_GPIO_CLK|RS485_USART_TX_GPIO_CLK|RS485_RE_GPIO_CLK, ENABLE);
-	RCC_APB1PeriphClockCmd(RS485_USART_CLK, ENABLE); 	
-	
-	// 将USART Tx的GPIO配置为推挽复用模式
-	GPIO_InitStructure.GPIO_Pin = RS485_USART_TX_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-	GPIO_Init(RS485_USART_TX_GPIO_PORT, &GPIO_InitStructure);
-  	
-	// 将USART Rx的GPIO配置为浮空输入模式
-	GPIO_InitStructure.GPIO_Pin = RS485_USART_RX_PIN;
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-	GPIO_Init(RS485_USART_RX_GPIO_PORT, &GPIO_InitStructure);	
+	GPIO_InitTypeDef GPIO_InitStruct;
   
-  /* 485收发控制管脚 */
-	GPIO_InitStructure.GPIO_Pin = RS485_RE_PIN;	
-	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;  
-	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz; 	
-  GPIO_Init(RS485_RE_GPIO_PORT, &GPIO_InitStructure);
-	  
-	/* USART 模式配置*/
-	USART_InitStructure.USART_BaudRate = RS485_USART_BAUDRATE;
-	USART_InitStructure.USART_WordLength = USART_WordLength_8b;
-	USART_InitStructure.USART_StopBits = USART_StopBits_1;
-	USART_InitStructure.USART_Parity = USART_Parity_No ;
-	USART_InitStructure.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
-	USART_InitStructure.USART_Mode = USART_Mode_Rx | USART_Mode_Tx;
+  _485_USART_RX_GPIO_CLK_ENABLE();
+  _485_USART_TX_GPIO_CLK_ENABLE();
+  _485_RE_GPIO_CLK_ENABLE();
+  
+  /* 使能 UART 时钟 */
+  _485_USART_CLK_ENABLE();
 
-	USART_Init(RS485_USART, &USART_InitStructure); 
-	/*使能USART*/
-  USART_Cmd(RS485_USART, ENABLE);
-	
-	/*配置中断优先级*/
-	NVIC_Configuration();
-	/* 使能串口接收中断 */
-	USART_ITConfig(RS485_USART, USART_IT_RXNE, ENABLE);
-	
-	/*控制485芯片进入接收模式*/
-	GPIO_ResetBits(RS485_RE_GPIO_PORT,RS485_RE_PIN);
+  /**USART2 GPIO Configuration    
+  PD5    ------> USART2_TX
+  PD6    ------> USART2_RX 
+  */
+  /* 配置Tx引脚为复用功能  */
+  GPIO_InitStruct.Pin = _485_USART_TX_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(_485_USART_TX_GPIO_PORT, &GPIO_InitStruct);
+  
+  /* 配置Rx引脚为复用功能 */
+  GPIO_InitStruct.Pin = _485_USART_RX_PIN;
+  HAL_GPIO_Init(_485_USART_RX_GPIO_PORT, &GPIO_InitStruct); 
+  
+ /* 485收发控制管脚 */
+  GPIO_InitStruct.Pin = _485_RE_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+  HAL_GPIO_Init(_485_RE_GPIO_PORT, &GPIO_InitStruct);
+  
+  /* 配置串485_USART 模式 */
+  Uart2_Handle.Instance = _485_USART;
+  Uart2_Handle.Init.BaudRate = _485_USART_BAUDRATE;
+  Uart2_Handle.Init.WordLength = UART_WORDLENGTH_8B;
+  Uart2_Handle.Init.StopBits = UART_STOPBITS_1;
+  Uart2_Handle.Init.Parity = UART_PARITY_NONE;
+  Uart2_Handle.Init.Mode = UART_MODE_TX_RX;
+  Uart2_Handle.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  Uart2_Handle.Init.OverSampling = UART_OVERSAMPLING_16;
+  HAL_UART_Init(&Uart2_Handle);
+
+  /*串口1中断初始化 */
+  NVIC_Configuration();
+  /*配置串口接收中断 */
+  __HAL_UART_ENABLE_IT(&Uart2_Handle,UART_IT_RXNE);
+  //默认进入接收模式
+  HAL_GPIO_WritePin(_485_RE_GPIO_PORT,_485_RE_PIN,GPIO_PIN_RESET);
 }
-
 
 
 /***************** 发送一个字符  **********************/
 //使用单字节数据发送前要使能发送引脚，发送后要使能接收引脚。
-void RS485_SendByte(  uint8_t ch )
+void _485_SendByte(  uint8_t ch )
 {
 	/* 发送一个字节数据到USART1 */
-	USART_SendData(RS485_USART,ch);
-		
-	/* 等待发送完毕 */
-	while (USART_GetFlagStatus(RS485_USART, USART_FLAG_TXE) == RESET);	
-	
+    HAL_UART_Transmit(&Uart2_Handle, (uint8_t *)&ch, 1, 0xFFFF);	
 }
 /*****************  发送指定长度的字符串 **********************/
-void RS485_SendStr_length( uint8_t *str,uint32_t strlen )
+void _485_SendStr_length( uint8_t *str,uint32_t strlen )
 {
 	unsigned int k=0;
 
-	RS485_TX_EN()	;//	使能发送数据	
+	_485_TX_EN()	;//	使能发送数据	
     do 
     {
-        RS485_SendByte( *(str + k) );
+        _485_SendByte( *(str + k) );
         k++;
     } while(k < strlen);
 		
 	/*加短暂延时，保证485发送数据完毕*/
 	Delay(0xFFF);
 		
-	RS485_RX_EN()	;//	使能接收数据
+	_485_RX_EN()	;//	使能接收数据
 }
 
 
 /*****************  发送字符串 **********************/
-void RS485_SendString(  uint8_t *str)
+void _485_SendString(  uint8_t *str)
 {
 	unsigned int k=0;
 	
-	RS485_TX_EN()	;//	使能发送数据
+	_485_TX_EN()	;//	使能发送数据
 	
     do 
     {
-        RS485_SendByte(  *(str + k) );
+        _485_SendByte(  *(str + k) );
         k++;
     } while(*(str + k)!='\0');
 	
 	/*加短暂延时，保证485发送数据完毕*/
 	Delay(0xFFF);
 		
-	RS485_RX_EN()	;//	使能接收数据
+	_485_RX_EN()	;//	使能接收数据
 }
-
-
-
-
-
-
 
 
 
 //中断缓存串口数据
 #define UART_BUFF_SIZE      1024
-volatile    uint16_t uart_p = 0;
+volatile    uint16_t uart_p = 1;
 uint8_t     uart_buff[UART_BUFF_SIZE];
 
-void bsp_RS485_IRQHandler(void)
+void bsp_485_IRQHandler(void)
 {
     if(uart_p<UART_BUFF_SIZE)
     {
-        if(USART_GetITStatus(RS485_USART, USART_IT_RXNE) != RESET)
+        if(__HAL_UART_GET_FLAG( &Uart2_Handle, UART_IT_RXNE ) != RESET)
         {
-            uart_buff[uart_p] = USART_ReceiveData(RS485_USART);
+            HAL_UART_Receive(&Uart2_Handle, (uint8_t *)(&uart_buff[uart_p]),1 , 1000);
             uart_p++;
-						
-						USART_ClearITPendingBit(RS485_USART, USART_IT_RXNE);
         }
     }
-		else
-		{
-			USART_ClearITPendingBit(RS485_USART, USART_IT_RXNE);
-//			clean_rebuff();       
-		}
+	else
+	{
+		clean_rebuff();       
+	}
+	HAL_UART_IRQHandler(&Uart2_Handle);
 }
-
-
 
 //获取接收到的数据和长度
 char *get_rebuff(uint16_t *len) 
@@ -189,11 +175,7 @@ void clean_rebuff(void)
     uart_p = 0;
 	while(i)
 		uart_buff[--i]=0;
-
 }
-
-
-
 
 static void Delay(__IO uint32_t nCount)	 //简单的延时函数
 {
