@@ -620,6 +620,21 @@
               <FileType>1</FileType>
               <FilePath>..\Libraries\STM32F1xx_HAL_Driver\Src\stm32f1xx_ll_usb.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_calendar.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\rtc\bsp_calendar.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_date.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\rtc\bsp_date.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\rtc\bsp_rtc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -659,6 +674,11 @@
               <FileName>bsp_spi_flash.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\flash\bsp_spi_flash.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\rtc\bsp_rtc.c</FilePath>
             </File>
           </Files>
         </Group>
