@@ -1,19 +1,13 @@
  
 #include "bsp_wwdg.h"   
 
-
+WWDG_HandleTypeDef WWDG_Handle;
 
 // WWDG 中断优先级初始化
 static void WWDG_NVIC_Config(void)
 {
-  NVIC_InitTypeDef NVIC_InitStructure; 
-  
-  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1); 
-  NVIC_InitStructure.NVIC_IRQChannel = WWDG_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
+  HAL_NVIC_SetPriority(WWDG_IRQn,0,0);
+	HAL_NVIC_EnableIRQ(WWDG_IRQn);
 }
 
 /* WWDG 配置函数
@@ -28,34 +22,28 @@ static void WWDG_NVIC_Config(void)
 void WWDG_Config(uint8_t tr, uint8_t wr, uint32_t prv)
 {	
 	// 开启 WWDG 时钟
-	RCC_APB1PeriphClockCmd(RCC_APB1Periph_WWDG, ENABLE);
-	
-	// 设置递减计数器的值
-	WWDG_SetCounter( tr );
-	
-	// 设置预分频器的值
-	WWDG_SetPrescaler( prv );
-	
-	// 设置上窗口值
-	WWDG_SetWindowValue( wr );
-	
-	// 设置计数器的值，使能WWDG
-	WWDG_Enable(WWDG_CNT);	
-	
-	// 清除提前唤醒中断标志位
-	WWDG_ClearFlag();	
+	__HAL_RCC_WWDG_CLK_ENABLE();
 	// 配置WWDG中断优先级
-	WWDG_NVIC_Config();	
-	// 开WWDG 中断
-	WWDG_EnableIT();
+	WWDG_NVIC_Config();
+	// 配置WWDG句柄即寄存器基地址
+	WWDG_Handle.Instance = WWDG;
+	// 设置预分频器值
+	WWDG_Handle.Init.Prescaler = prv;
+	// 设置上窗口值
+	WWDG_Handle.Init.Window = wr;	
+	// 设置计数器的值
+	WWDG_Handle.Init.Counter = tr;
+	// 使能提前唤醒中断
+	WWDG_Handle.Init.EWIMode = WWDG_EWI_ENABLE;
+	// 初始化WWDG
+	HAL_WWDG_Init(&WWDG_Handle);	
 }
 
 // 喂狗
 void WWDG_Feed(void)
 {
 	// 喂狗，刷新递减计数器的值，设置成最大WDG_CNT=0X7F
-	WWDG_SetCounter( WWDG_CNT );
+	HAL_WWDG_Refresh(&WWDG_Handle);
 }
-
 
 /*********************************************END OF FILE**********************/

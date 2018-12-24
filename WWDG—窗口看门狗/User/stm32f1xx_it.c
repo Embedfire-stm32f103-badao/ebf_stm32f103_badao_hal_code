@@ -39,6 +39,8 @@
 #include "main.h"
 #include "stm32f1xx_it.h"
 #include "./usart/bsp_debug_usart.h"
+#include "./wwdg/bsp_wwdg.h"  
+#include "./led/bsp_led.h" 
 
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
@@ -164,16 +166,24 @@ void SysTick_Handler(void)
 /*  file (startup_stm32f4xx.s).                                               */
 /******************************************************************************/
 
-/**
-  * @brief  This function handles External line 0 interrupt request.
-  * @param  None
-  * @retval None
-  */
-void EXTI0_IRQHandler(void)
+
+
+
+// WWDG 中断服务程序，如果发生了此中断，表示程序已经出现了故障，
+// 这是一个死前中断。在此中断服务程序中应该干最重要的事，
+// 比如保存重要的数据等
+void WWDG_IRQHandler(void)
 {
-  
+	//WWDG 中断服务处理函数，用户代码在提前唤醒中断回调函数中添加
+	HAL_WWDG_IRQHandler(&WWDG_Handle);
 }
 
+void HAL_WWDG_EarlyWakeupCallback(WWDG_HandleTypeDef* hwwdg)
+{
+	//黄灯亮，点亮LED只是示意性的操作，
+	//真正使用的时候，这里应该是做最重要的事情
+	LED_YELLOW; 
+}
 /**
   * @brief  This function handles PPP interrupt request.
   * @param  None

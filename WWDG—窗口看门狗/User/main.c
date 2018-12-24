@@ -20,27 +20,7 @@
 #include "stm32f1xx.h"
 #include "./usart/bsp_debug_usart.h"
 #include "./led/bsp_led.h"  
-
-/**
-  * @brief  打印指令输入提示信息
-  * @param  无
-  * @retval 无
-  */
-static void Show_Message(void)
-{
-  printf("\r\n   这是一个通过串口通信指令控制RGB彩灯实验 \n");
-  printf("开发板接到指令后控制RGB彩灯颜色，指令对应如下：\n");
-  printf("   指令   ------ 彩灯颜色 \n");
-  printf("     1    ------    红 \n");
-  printf("     2    ------    绿 \n");
-  printf("     3    ------    蓝 \n");
-  printf("     4    ------    黄 \n");
-  printf("     5    ------    紫 \n");
-  printf("     6    ------    青 \n");
-  printf("     7    ------    白 \n");
-  printf("     8    ------    灭 \n");  
-}
-
+#include "bsp_wwdg.h"
 
 /**
   * @brief  主函数
@@ -49,61 +29,57 @@ static void Show_Message(void)
   */
 int main(void)
 {
-  char ch;   
-  
-  HAL_Init();        
-  /* 配置系统时钟为180 MHz */ 
+	uint8_t wwdg_tr, wwdg_wr;
+    /* 系统时钟初始化成216 MHz */
   SystemClock_Config();
-	/* 初始化RGB彩灯 */ 
-  LED_GPIO_Config(); 
-  /*初始化USART 配置模式为 115200 8-N-1，中断接收*/
-  DEBUG_USART_Config();
-  
-	/* 打印指令输入提示信息 */
-  Show_Message();
+	/* LED 端口初始化 */
+	LED_GPIO_Config();	   
+
+	//检查窗口看门狗复位标志位
+	if (__HAL_RCC_GET_FLAG(RCC_FLAG_WWDGRST) != RESET)
+	{
+		// 看门狗复位启动，红色灯亮
+		LED_RED;
+
+		//清除复位标志位
+		__HAL_RCC_CLEAR_RESET_FLAGS();
+	}
+	else
+	{
+		// 正常启动，蓝色灯亮
+		LED_BLUE;
+	}
+	HAL_Delay(500);
+	LED_RGBOFF;
+	HAL_Delay(500);
+
+	// WWDG配置	
+	// 初始化WWDG：配置计数器初始值，配置上窗口值，启动WWDG，使能提前唤醒中断
+	WWDG_Config(127,80,WWDG_PRESCALER_8);	
 	
-  while(1)
-    {	
-        /* 获取字符指令 */
-        ch=getchar();
-        printf("接收到字符：%c\n",ch);
-				
-        /* 根据字符指令控制RGB彩灯颜色 */
-        switch(ch)
-        {
-          case '1':
-            LED_RED;
-          break;
-          case '2':
-            LED_GREEN;
-          break;
-          case '3':
-            LED_BLUE;
-          break;
-          case '4':
-            LED_YELLOW;
-          break;
-          case '5':
-            LED_PURPLE;
-          break;
-          case '6':
-            LED_CYAN;
-          break;
-          case '7':
-            LED_WHITE;
-          break;
-          case '8':
-            LED_RGBOFF;
-          break;
-          default:
-            /* 如果不是指定指令字符，打印提示信息 */
-          Show_Message();
-          break;      
-        }   
-    }	
+	// 窗口值我们在初始化的时候设置成0X5F，这个值不会改变
+	wwdg_wr = WWDG->CFR & 0X7F;
+
+	while(1)
+	{	
+		//-----------------------------------------------------
+		// 这部分应该写需要被WWDG监控的程序，这段程序运行的时间
+		// 决定了窗口值应该设置成多大。
+		//-----------------------------------------------------
+		// 计时器值，初始化成最大0X7F，当开启WWDG时候，这个值会不断减小
+		// 当计数器的值大于窗口值时喂狗的话，会复位，当计数器减少到0X40
+		// 还没有喂狗的话就非常非常危险了，计数器再减一次到了0X3F时就复位
+		// 所以要当计数器的值在窗口值和0X40之间的时候喂狗，其中0X40是固定的。
+		wwdg_tr = WWDG->CR & 0X7F;
+		if( wwdg_tr == wwdg_wr)
+		{
+			// 喂狗，重新设置计数器的值为最大0X7F
+			WWDG_Feed();
+			// 正常喂狗，绿色灯闪烁
+			LED2_TOGGLE;
+		}
+	}
 }
-
-
 
 /**
   * @brief  System Clock Configuration
