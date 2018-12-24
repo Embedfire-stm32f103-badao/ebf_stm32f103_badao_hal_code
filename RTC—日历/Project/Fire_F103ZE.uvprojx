@@ -660,6 +660,11 @@
               <FileType>1</FileType>
               <FilePath>..\User\flash\bsp_spi_flash.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_rtc.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\rtc\bsp_rtc.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
