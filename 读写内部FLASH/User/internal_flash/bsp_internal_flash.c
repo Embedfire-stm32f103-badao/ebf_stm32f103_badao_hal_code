@@ -16,155 +16,121 @@
   */
   
 #include "./internal_flash/bsp_internal_flash.h"   
-#include "./usart/bsp_debug_usart.h"
-
-/*准备写入的测试数据*/
-#define DATA_32                 ((uint32_t)0x87654321)
+#include "./led/bsp_led.h"   
 
 
-/* Exported types ------------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-/* 要擦除内部FLASH的起始地址 */
-#define FLASH_USER_START_ADDR   ADDR_FLASH_SECTOR_5   
-/* 要擦除内部FLASH的结束地址 */
-#define FLASH_USER_END_ADDR     ADDR_FLASH_SECTOR_7  
+#define FLASH_USER_START_ADDR   ADDR_FLASH_PAGE_32   /* Start @ of user Flash area */
+#define FLASH_USER_END_ADDR     ADDR_FLASH_PAGE_48  /* End @ of user Flash area */
 
+#define DATA_32                 ((uint32_t)0x12345678)
 
-static uint32_t GetSector(uint32_t Address);
+uint32_t Address = 0, PAGEError = 0;
+__IO uint32_t data32 = 0 , MemoryProgramStatus = 0;
+
+/*Variable used for Erase procedure*/
+ FLASH_EraseInitTypeDef EraseInitStruct;
+
 
 /**
   * @brief  InternalFlash_Test,对内部FLASH进行读写测试
   * @param  None
   * @retval None
   */
-int InternalFlash_Test(void)
+void InternalFlash_Test(void)
 {
-	/*要擦除的起始扇区(包含)及结束扇区(不包含)，如8-12，表示擦除8、9、10、11扇区*/
-	uint32_t FirstSector = 0;
-	uint32_t NbOfSectors = 0;
-	
-	uint32_t SECTORError = 0;
-	
-	uint32_t Address = 0;
+	/* Unlock the Flash to enable the flash control register access *************/
+  HAL_FLASH_Unlock();
 
-	__IO uint32_t Data32 = 0;
-	__IO uint32_t MemoryProgramStatus = 0;
-	static FLASH_EraseInitTypeDef EraseInitStruct;
-	
-	/* FLASH 解锁 ********************************/
-	/* 使能访问FLASH控制寄存器 */
-	HAL_FLASH_Unlock();
+  /* Erase the user Flash area
+    (area defined by FLASH_USER_START_ADDR and FLASH_USER_END_ADDR) ***********/
 
-	FirstSector = GetSector(FLASH_USER_START_ADDR);
-	NbOfSectors = GetSector(FLASH_USER_END_ADDR)- FirstSector + 1;
-	
-	/* 擦除用户区域 (用户区域指程序本身没有使用的空间，可以自定义)**/
-	/* Fill EraseInit structure*/
-	EraseInitStruct.TypeErase     = FLASH_TYPEERASE_SECTORS;
-	EraseInitStruct.VoltageRange  = FLASH_VOLTAGE_RANGE_3;/* 以“字”的大小进行操作 */ 
-	EraseInitStruct.Sector        = FirstSector;
-	EraseInitStruct.NbSectors     = NbOfSectors;
-	/* 开始擦除操作 */
-	if (HAL_FLASHEx_Erase(&EraseInitStruct, &SECTORError) != HAL_OK)
-	{
-		/*擦除出错，返回，实际应用中可加入处理 */
-		return -1;
-	}
+  /* Fill EraseInit structure*/
+  EraseInitStruct.TypeErase   = FLASH_TYPEERASE_PAGES;
+  EraseInitStruct.PageAddress = FLASH_USER_START_ADDR;
+  EraseInitStruct.NbPages     = (FLASH_USER_END_ADDR - FLASH_USER_START_ADDR) / FLASH_PAGE_SIZE;
 
-	/* 以“字”的大小为单位写入数据 ********************************/
-	Address = FLASH_USER_START_ADDR;
+  if (HAL_FLASHEx_Erase(&EraseInitStruct, &PAGEError) != HAL_OK)
+  {
+    /*
+      Error occurred while page erase.
+      User can add here some code to deal with this error.
+      PAGEError will contain the faulty page and then to know the code error on this page,
+      user can call function 'HAL_FLASH_GetError()'
+    */
+    /* Infinite loop */
+    while (1)
+    {
+      LED1_ON;
+      /* indicate error in Erase operation */
+     printf("擦除失败\r\n");
+    }
+  }
 
-	while (Address < FLASH_USER_END_ADDR)
-	{
-		if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, Address, DATA_32) == HAL_OK)
-		{
-		  Address = Address + 4;
-		}
-		else
-		{ 
-		  /*写入出错，返回，实际应用中可加入处理 */
-				return -1;
-		}
-	}
+  /* Program the user Flash area word by word
+    (area defined by FLASH_USER_START_ADDR and FLASH_USER_END_ADDR) ***********/
 
+  Address = FLASH_USER_START_ADDR;
 
-	/* 给FLASH上锁，防止内容被篡改*/
-	HAL_FLASH_Lock(); 
+  while (Address < FLASH_USER_END_ADDR)
+  {
+    if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, Address, DATA_32) == HAL_OK)
+    {
+      Address = Address + 4;
+    }
+    else
+    {
+      /* Error occurred while writing data in Flash memory.
+         User can add here some code to deal with this error */
+      while (1)
+      {
+         LED1_ON;
+         /* indicate error in Erase operation */
+         printf("写入失败\r\n");
+      }
+    }
+  }
 
+  /* Lock the Flash to disable the flash control register access (recommended
+     to protect the FLASH memory against possible unwanted operation) *********/
+  HAL_FLASH_Lock();
 
-	/* 从FLASH中读取出数据进行校验***************************************/
-	/*  MemoryProgramStatus = 0: 写入的数据正确
-	  MemoryProgramStatus != 0: 写入的数据错误，其值为错误的个数 */
-	Address = FLASH_USER_START_ADDR;
-	MemoryProgramStatus = 0;
+  /* Check if the programmed data is OK
+      MemoryProgramStatus = 0: data programmed correctly
+      MemoryProgramStatus != 0: number of words not programmed correctly ******/
+  Address = FLASH_USER_START_ADDR;
+  MemoryProgramStatus = 0x0;
 
-	while (Address < FLASH_USER_END_ADDR)
-	{
-		Data32 = *(__IO uint32_t*)Address;
+  while (Address < FLASH_USER_END_ADDR)
+  {
+    data32 = *(__IO uint32_t *)Address;
 
-		if (Data32 != DATA_32)
-		{
-		  MemoryProgramStatus++;  
-		}
+    if (data32 != DATA_32)
+    {
+      MemoryProgramStatus++;
+    }
+    Address = Address + 4;
+  }
 
-		Address = Address + 4;
-	}  
-	/* 数据校验不正确 */
-	if(MemoryProgramStatus)
-	{    
-		return -1;
-	}
-	else /*数据校验正确*/
-	{ 
-		return 0;   
-	}
+  /*Check if there is an issue to program data*/
+  if (MemoryProgramStatus == 0)
+  {
+    printf("写入成功\r\n");
+    /* No error detected. Switch on LED2*/
+    LED2_ON;
+  }
+  else
+  {
+    /* Error detected. LED1 will blink with 1s period */
+    while (1)
+    {
+      LED1_ON;
+         /* indicate error in Erase operation */
+      printf("失败\r\n");
+    }
+  }
+
+  /* Infinite loop */
+  while (1)
+  {
+  }
 }
-
-/**
-  * @brief  根据输入的地址给出它所在的sector
-  *					例如：
-						uwStartSector = GetSector(FLASH_USER_START_ADDR);
-						uwEndSector = GetSector(FLASH_USER_END_ADDR);	
-  * @param  Address：地址
-  * @retval 地址所在的sector
-  */
-static uint32_t GetSector(uint32_t Address)
-{
-  uint32_t sector = 0;
-  
-  if((Address < ADDR_FLASH_SECTOR_1) && (Address >= ADDR_FLASH_SECTOR_0))
-  {
-    sector = FLASH_SECTOR_0;  
-  }
-  else if((Address < ADDR_FLASH_SECTOR_2) && (Address >= ADDR_FLASH_SECTOR_1))
-  {
-    sector = FLASH_SECTOR_1;  
-  }
-  else if((Address < ADDR_FLASH_SECTOR_3) && (Address >= ADDR_FLASH_SECTOR_2))
-  {
-    sector = FLASH_SECTOR_2;  
-  }
-  else if((Address < ADDR_FLASH_SECTOR_4) && (Address >= ADDR_FLASH_SECTOR_3))
-  {
-    sector = FLASH_SECTOR_3;  
-  }
-  else if((Address < ADDR_FLASH_SECTOR_5) && (Address >= ADDR_FLASH_SECTOR_4))
-  {
-    sector = FLASH_SECTOR_4;  
-  }
-  else if((Address < ADDR_FLASH_SECTOR_6) && (Address >= ADDR_FLASH_SECTOR_5))
-  {
-    sector = FLASH_SECTOR_5;  
-  }
-  else if((Address < ADDR_FLASH_SECTOR_7) && (Address >= ADDR_FLASH_SECTOR_6))
-  {
-    sector = FLASH_SECTOR_6;  
-  }
-  else/*(Address < FLASH_END_ADDR) && (Address >= ADDR_FLASH_SECTOR_23))*/
-  {
-    sector = FLASH_SECTOR_7;  
-  }
-  return sector;
-}
-
-
