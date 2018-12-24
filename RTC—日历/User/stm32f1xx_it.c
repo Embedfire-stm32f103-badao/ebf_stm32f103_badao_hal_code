@@ -164,7 +164,29 @@ void SysTick_Handler(void)
 /*  file (startup_stm32f4xx.s).                                               */
 /******************************************************************************/
 
+/**
+  * @brief  This function handles External line 0 interrupt request.
+  * @param  None
+  * @retval None
+  */
+void EXTI0_IRQHandler(void)
+{
+  
+}
 
+extern uint8_t Rxflag;
+
+void  DEBUG_USART_IRQHandler(void)
+{
+  uint8_t ch=0; 
+  
+	if(__HAL_UART_GET_FLAG( &UartHandle, UART_FLAG_RXNE ) != RESET)
+	{		
+    ch=( uint16_t)READ_REG(UartHandle.Instance->DR);
+    WRITE_REG(UartHandle.Instance->DR,ch); 
+ 
+	}
+}
 /**
   * @brief  This function handles PPP interrupt request.
   * @param  None
