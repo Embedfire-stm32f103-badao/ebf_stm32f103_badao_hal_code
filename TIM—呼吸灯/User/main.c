@@ -18,7 +18,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f1xx.h"
-#include "./led/bsp_led.h"
+#include "./breathinglight/bsp_breathing.h"
 
 /**
   * @brief  主函数
@@ -27,53 +27,19 @@
   */
 int main(void)
 {
-    /* 系统时钟初始化成216 MHz */
-    SystemClock_Config();
+  /* 系统时钟初始化成72 MHz */
+  SystemClock_Config();
 
-    /* LED 端口初始化 */
-    LED_GPIO_Config();
-
-    /* 控制LED灯 */
-    while (1)
-    {
-        LED1( ON );			 // 亮 
-        HAL_Delay(1000);
-        LED1( OFF );		  // 灭
-        HAL_Delay(1000);
-
-        LED2( ON );			// 亮 
-        HAL_Delay(1000);
-        LED2( OFF );		  // 灭
-
-        LED3( ON );			 // 亮 
-        HAL_Delay(1000);
-        LED3( OFF );		  // 灭	
-              
-        /*轮流显示 红绿蓝黄紫青白 颜色*/
-        LED_RED;
-        HAL_Delay(1000);
-        
-        LED_GREEN;
-        HAL_Delay(1000);
-        
-        LED_BLUE;
-        HAL_Delay(1000);
-        
-        LED_YELLOW;
-        HAL_Delay(1000);
-        
-        LED_PURPLE;
-        HAL_Delay(1000);
-                
-        LED_CYAN;
-        HAL_Delay(1000);
-        
-        LED_WHITE;
-        HAL_Delay(1000);
-        
-        LED_RGBOFF;
-        HAL_Delay(1000);
-    }
+  TIMx_Mode_Config();
+  
+  /* 启动通道PWM输出 */
+  HAL_TIM_Base_Start_IT(&BRE_TIM);
+  HAL_TIM_PWM_Start(&BRE_TIM,TIM_CHANNEL_3);
+  
+  while (1)
+  {
+  }
+   
 }
 /**
   * @brief  System Clock Configuration

@@ -40,6 +40,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f1xx_it.h"
+#include "./breathinglight/bsp_breathing.h"
 
 /** @addtogroup STM32F1xx_HAL_Examples
   * @{
@@ -171,6 +172,37 @@ void SysTick_Handler(void)
   * @param  None
   * @retval None
   */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  static uint8_t pwm_index = 1;			/* 用于PWM查表 */
+	static uint8_t period_cnt = 0;		/* 用于计算周期数 */
+
+  period_cnt++;
+  /* 若输出的周期数大于20，输出下一种脉冲宽的PWM波 */
+  if(period_cnt >= 20)										
+  {
+    /* 根据PWM表修改定时器的比较寄存器值 */
+    __HAL_TIM_SET_COMPARE(&BRE_TIM,TIM_CHANNEL_3,indexWave[pwm_index]);
+    
+    /* 标志PWM表的下一个元素 */
+    pwm_index++;												
+    /* 若PWM脉冲表已经输出完成一遍，重置PWM查表标志 */
+    if( pwm_index >=  POINT_NUM)								
+    {
+      pwm_index=0;								
+    }
+    /* 重置周期计数标志 */
+    period_cnt=0;												
+  }
+}
+
+/**
+* @brief This function handles TIM3 global interrupt.
+*/
+void BRE_TIM_IRQHANDLER(void)
+{
+  HAL_TIM_IRQHandler(&BRE_TIM);
+}
 /*void PPP_IRQHandler(void)
 {
 }*/

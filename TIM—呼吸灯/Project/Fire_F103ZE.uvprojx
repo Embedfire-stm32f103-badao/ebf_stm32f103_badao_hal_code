@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>LED</TargetName>
+      <TargetName>呼吸灯</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060528::V5.06 update 5 (build 528)::ARMCC</pCCUsed>
@@ -636,14 +636,9 @@
               <FilePath>..\User\stm32f1xx_it.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_led.c</FileName>
+              <FileName>bsp_breathing.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\led\bsp_led.c</FilePath>
-            </File>
-            <File>
-              <FileName>stm32f1xx_hal_conf.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\User\stm32f1xx_hal_conf.h</FilePath>
+              <FilePath>..\User\breathinglight\bsp_breathing.c</FilePath>
             </File>
           </Files>
         </Group>
