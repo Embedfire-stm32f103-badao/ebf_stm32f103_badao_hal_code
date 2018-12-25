@@ -1,5 +1,5 @@
 /*---------------------------------------------------------------------------/
-/  FatFs - FAT file system module include R0.11a    (C)ChaN, 2015
+/  FatFs - FAT file system module include R0.11     (C)ChaN, 2015
 /----------------------------------------------------------------------------/
 / FatFs module is a free software that opened under license policy of
 / following conditions.
@@ -17,7 +17,7 @@
 
 
 #ifndef _FATFS
-#define _FATFS	64180	/* Revision ID */
+#define _FATFS	32020	/* Revision ID */
 
 #ifdef __cplusplus
 extern "C" {
@@ -76,6 +76,10 @@ typedef char TCHAR;
 /* File system object structure (FATFS) */
 
 typedef struct {
+  union{
+	UINT	d32[_MAX_SS/4]; /* Force 32bits alignement */     
+	BYTE	d8[_MAX_SS];	/* Disk access window for Directory, FAT (and file data at tiny cfg) */  
+  }win;
 	BYTE	fs_type;		/* FAT sub-type (0:Not mounted) */
 	BYTE	drv;			/* Physical drive number */
 	BYTE	csize;			/* Sectors per cluster (1,2,4...128) */
@@ -104,7 +108,7 @@ typedef struct {
 	DWORD	dirbase;		/* Root directory start sector (FAT32:Cluster#) */
 	DWORD	database;		/* Data start sector */
 	DWORD	winsect;		/* Current sector appearing in the win[] */
-	BYTE	win[_MAX_SS];	/* Disk access window for Directory, FAT (and file data at tiny cfg) */
+	
 } FATFS;
 
 
@@ -112,6 +116,12 @@ typedef struct {
 /* File object structure (FIL) */
 
 typedef struct {
+#if !_FS_TINY
+  union{  
+	UINT	d32[_MAX_SS/4]; /* Force 32bits alignement */     
+	BYTE	d8[_MAX_SS];	/* File data read/write buffer */
+  }buf;
+#endif
 	FATFS*	fs;				/* Pointer to the related file system object (**do not change order**) */
 	WORD	id;				/* Owner file system mount ID (**do not change order**) */
 	BYTE	flag;			/* Status flags */
@@ -131,9 +141,7 @@ typedef struct {
 #if _FS_LOCK
 	UINT	lockid;			/* File lock ID origin from 1 (index of file semaphore table Files[]) */
 #endif
-#if !_FS_TINY
-	BYTE	buf[_MAX_SS];	/* File private data read/write window */
-#endif
+
 } FIL;
 
 
@@ -141,6 +149,12 @@ typedef struct {
 /* Directory object structure (DIR) */
 
 typedef struct {
+#if !_FS_TINY
+  union{  
+            UINT     d32[_MAX_SS/4];  /* Force 32bits alignement */  
+            BYTE   d8[_MAX_SS];  /* File data read/write buffer */
+  }buf;
+#endif   
 	FATFS*	fs;				/* Pointer to the owner file system object (**do not change order**) */
 	WORD	id;				/* Owner file system mount ID (**do not change order**) */
 	WORD	index;			/* Current read/write index number */
@@ -200,7 +214,7 @@ typedef enum {
 	FR_TIMEOUT,				/* (15) Could not get a grant to access the volume within defined period */
 	FR_LOCKED,				/* (16) The operation is rejected according to the file sharing policy */
 	FR_NOT_ENOUGH_CORE,		/* (17) LFN working buffer could not be allocated */
-	FR_TOO_MANY_OPEN_FILES,	/* (18) Number of open files > _FS_LOCK */
+	FR_TOO_MANY_OPEN_FILES,	/* (18) Number of open files > _FS_SHARE */
 	FR_INVALID_PARAMETER	/* (19) Given parameter is invalid */
 } FRESULT;
 
