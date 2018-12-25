@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>sd</TargetName>
+      <TargetName>串口</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060528::V5.06 update 5 (build 528)::ARMCC</pCCUsed>
@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xE</Define>
               <Undefine></Undefine>
-              <IncludePath>..\Libraries\CMSIS\Include;..\Libraries\CMSIS\Device\ST\STM32F1xx\Include;..\Libraries\STM32F1xx_HAL_Driver\Inc;..\User;..\User\led;..\User\FatFs;..\User\FatFs\option;..\User\FatFs\drivers</IncludePath>
+              <IncludePath>..\Libraries\CMSIS\Include;..\Libraries\CMSIS\Device\ST\STM32F1xx\Include;..\Libraries\STM32F1xx_HAL_Driver\Inc;..\User;..\User\led</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -645,21 +645,6 @@
               <FileType>1</FileType>
               <FilePath>..\User\usart\bsp_debug_usart.c</FilePath>
             </File>
-            <File>
-              <FileName>bsp_sdio_sdcard.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\sdio\bsp_sdio_sdcard.c</FilePath>
-            </File>
-            <File>
-              <FileName>sdio_test.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\sdio\sdio_test.c</FilePath>
-            </File>
-            <File>
-              <FileName>bsp_key.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\key\bsp_key.c</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
@@ -669,36 +654,6 @@
               <FileName>readme.txt</FileName>
               <FileType>5</FileType>
               <FilePath>..\Doc\readme.txt</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>FatFs</GroupName>
-          <Files>
-            <File>
-              <FileName>diskio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\FATFS\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>ff.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\FATFS\ff.c</FilePath>
-            </File>
-            <File>
-              <FileName>sd_diskio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\FatFs\drivers\sd_diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>ff_gen_drv.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\FatFs\ff_gen_drv.c</FilePath>
-            </File>
-            <File>
-              <FileName>cc936.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\FatFs\option\cc936.c</FilePath>
             </File>
           </Files>
         </Group>
