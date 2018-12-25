@@ -16,100 +16,205 @@
   */
   
 #include "./protect/bsp_readWriteProtect.h"   
-#include "./usart/bsp_usart.h"
+#include "./usart/bsp_debug_usart.h"
+#include "./led/bsp_led.h"   
+
+typedef enum {FAILED = 0, PASSED = !FAILED} TestStatus;
+
+#define WRITE_PROTECTION_DISABLE
+
+#define FLASH_USER_START_ADDR       ADDR_FLASH_PAGE_32   /* Start @ of user Flash area */
+#define FLASH_USER_END_ADDR         ADDR_FLASH_PAGE_48   /* End @ of user Flash area */
+#define FLASH_PAGE_TO_BE_PROTECTED (OB_WRP_PAGES0TO1 | OB_WRP_PAGES2TO3)  
+
+#define DATA_32                     ((uint32_t)0x12345678)
 
 
+#if !defined(WRITE_PROTECTION_ENABLE)&&!defined(WRITE_PROTECTION_DISABLE)
+#define WRITE_PROTECTION_DISABLE
+#endif /* !WRITE_PROTECTION_ENABLE && !WRITE_PROTECTION_DISABLE */
 
-/**
-  * @brief  反转写保护的配置，用于演示
-	          若芯片处于写保护状态，则解除，
-						若不是写保护状态，则设置成写保护
-  * @param  无
-  * @retval 无
-  */
-void WriteProtect_Toggle(void)
-{
-	/* 获取写保护寄存器的值进行判断，寄存器位为0表示有保护，为1表示无保护 */
-	/*  若不等于0xFFFFFFFF，则说明有部分页被写保护了 */
-	if(FLASH_GetWriteProtectionOptionByte() != 0xFFFFFFFF )
-	{
-			FLASH_DEBUG("芯片处于写保护状态，即将执行解保护过程...");
-			
-			//解除对FLASH_CR寄存器的访问限制
-			FLASH_Unlock();
+#if defined(WRITE_PROTECTION_ENABLE)&&defined(WRITE_PROTECTION_DISABLE)
+#error "Switches WRITE_PROTECTION_ENABLE & WRITE_PROTECTION_DISABLE cannot be enabled in the time!"
+#endif /* WRITE_PROTECTION_ENABLE && WRITE_PROTECTION_DISABLE */
 
-			/* 擦除所有选项字节的内容 */
-			FLASH_EraseOptionBytes();
+uint32_t Address = 0;
+uint32_t PageError = 0;
+__IO TestStatus MemoryProgramStatus = PASSED;
+/*用于擦除过程的变量*/
+ FLASH_EraseInitTypeDef EraseInitStruct;
+/*用于处理选项字节的变量*/
+ FLASH_OBProgramInitTypeDef OptionsBytesStruct;
 
-			/* 对所有页解除 */
-			FLASH_EnableWriteProtection(0x00000000);
-			
-			FLASH_DEBUG("配置完成，芯片将自动复位加载新配置，复位后芯片会解除写保护状态\r\n");
 
-			/* 复位芯片，以使选项字节生效 */
-			NVIC_SystemReset();
-	}
-	else //无写保护
-	{
-			FLASH_DEBUG("芯片处于无写保护状态，即将执行写保护过程...");
-			
-			//解除对FLASH_CR寄存器的访问限制
-			FLASH_Unlock();
-
-			/* 先擦除所有选项字节的内容，防止因为原有的写保护导致无法写入新的保护配置 */
-			FLASH_EraseOptionBytes();
-
-			/* 对所有页进行写保护 */
-			FLASH_EnableWriteProtection(FLASH_WRProt_AllPages);
-
-			FLASH_DEBUG("配置完成，芯片将自动复位加载新配置，复位后芯片会处于写保护状态\r\n");
-
-			/* 复位芯片，以使选项字节生效 */
-			NVIC_SystemReset();		
-	}
-
-}
 
 
 /**
-  * @brief  反转读保护的配置，用于演示
-	          若芯片处于读保护状态，则解除，
-						若不是读保护状态，则设置成读保护
-  * @param  无
-  * @retval 无
+  * @brief  FLASH_Test,普通的写保护配置
+  * @param  运行本函数后会给扇区FLASH_WRP_SECTORS进行写保护，再重复一次会进行解写保护
+  * @retval None
   */
-void ReadProtect_Toggle(void)
+void FLASH_Test(void)
 {
-	if(FLASH_GetReadOutProtectionStatus () == SET )
-	{
-		FLASH_DEBUG("芯片处于读保护状态\r\n");
-		
-		//解除对FLASH_CR寄存器的访问限制
-		FLASH_Unlock();
-		
-		FLASH_DEBUG("即将解除读保护，解除读保护会把FLASH的所有内容清空");
-		FLASH_DEBUG("由于解除后程序被清空，所以后面不会有任何提示输出");
-		FLASH_DEBUG("等待20秒后即可给芯片下载新的程序...\r\n");
-		
-		FLASH_ReadOutProtection (DISABLE);		
+	  /* 初始化测试状态 */
+  MemoryProgramStatus = PASSED;
+  
+  /* 解锁Flash以启用闪存控制寄存器访问*/ 
+  HAL_FLASH_Unlock();
 
-		//即使在此处加入printf串口调试也不会执行的，因为存储程序的整片FLASH都已被擦除。
-		FLASH_DEBUG("由于FLASH程序被清空，所以本代码不会被执行，串口不会有本语句输出（SRAM调试模式下例外）\r\n");
+  /* 解锁选项字节*/
+  HAL_FLASH_OB_Unlock();
 
-	}
-	else
-	{
-		FLASH_DEBUG("芯片处于无读保护状态，即将执行读保护过程...\r\n");
-		
-		//解除对FLASH_CR寄存器的访问限制
-		FLASH_Unlock();				
+  /* 获取页面写保护状态*/
+  HAL_FLASHEx_OBGetConfig(&OptionsBytesStruct);
 
-		FLASH_ReadOutProtection (ENABLE);
-		
-		printf("芯片已被设置为读保护，上电复位后生效（必须重新给开发板上电，只按复位键无效）\r\n");
-		printf("处于保护状态下无法正常下载新程序，必须要先解除保护状态再下载\r\n");
+#ifdef WRITE_PROTECTION_DISABLE
+  /* 检查所需页面是否已被写保护*/
+  if((OptionsBytesStruct.WRPPage & FLASH_PAGE_TO_BE_PROTECTED) != FLASH_PAGE_TO_BE_PROTECTED)
+  {
+    /*恢复写保护页面 */
+    OptionsBytesStruct.OptionType   = OPTIONBYTE_WRP;
+    OptionsBytesStruct.WRPState     = OB_WRPSTATE_DISABLE;
+    OptionsBytesStruct.WRPPage = FLASH_PAGE_TO_BE_PROTECTED;
+    if(HAL_FLASHEx_OBProgram(&OptionsBytesStruct) != HAL_OK)
+    {
+      while (1)
+      {
+       LED1_ON
+       printf("运行失败\r\n");
+      }
+    }
 
-	}
+    /* 生成系统重置以加载新选项字节值*/
+    HAL_FLASH_OB_Launch();
+  }
+#elif defined WRITE_PROTECTION_ENABLE
+  /* 检查所需页面是否尚未写保护*/
+  if(((~OptionsBytesStruct.WRPPage) & FLASH_PAGE_TO_BE_PROTECTED )!= FLASH_PAGE_TO_BE_PROTECTED)
+  {
+    /* 启用页面写保护*/
+    OptionsBytesStruct.OptionType = OPTIONBYTE_WRP;
+    OptionsBytesStruct.WRPState   = OB_WRPSTATE_ENABLE;
+    OptionsBytesStruct.WRPPage    = FLASH_PAGE_TO_BE_PROTECTED;
+    if(HAL_FLASHEx_OBProgram(&OptionsBytesStruct) != HAL_OK)
+    {
+      while (1)
+      {
+        LED1_ON
+        printf("运行失败\r\n");
+      }
+    }
+
+    /* 生成系统重置以加载新选项字节值*/
+    HAL_FLASH_OB_Launch();
+  }
+#endif /* WRITE_PROTECTION_DISABLE */
+
+  /*锁定选项字节*/
+  HAL_FLASH_OB_Lock();
+
+  /* 所选页面未被写保护*/
+  if ((OptionsBytesStruct.WRPPage & FLASH_PAGE_TO_BE_PROTECTED) != 0x00)
+  {
+    /*填写EraseInit结构*/
+    EraseInitStruct.TypeErase   = FLASH_TYPEERASE_PAGES;
+    EraseInitStruct.PageAddress = FLASH_USER_START_ADDR;
+    EraseInitStruct.NbPages     = (FLASH_USER_END_ADDR - FLASH_USER_START_ADDR)/FLASH_PAGE_SIZE;
+
+    if (HAL_FLASHEx_Erase(&EraseInitStruct, &PageError) != HAL_OK)
+    {
+      /* 
+       页面擦除时发生错误。 用户可以在这里添加一些代码来处理这个错误。 PageError将包含有问题的页面，然后知道此页面上的代码错误，
+       用户可以调用函数'HAL_FLASH_GetError（）'
+      */
+      while (1)
+      {
+        LED1_ON
+        printf("运行失败\r\n");
+      }
+    }
+
+    /*由FLASH_USER_START_ADDR和FLASH_USER_END_ADDR定义的地址处的DATA_32 FLASH字程序 */
+    Address = FLASH_USER_START_ADDR;
+    while (Address < FLASH_USER_END_ADDR)
+    {
+      if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, Address, DATA_32) == HAL_OK)
+      {
+        Address = Address + 4;
+      }
+      else
+      {
+        while (1)
+        {
+          LED1_ON
+           printf("运行失败\r\n");
+        }
+      }
+    }
+
+    /*检查书面数据的正确性*/
+    Address = FLASH_USER_START_ADDR;
+
+    while (Address < FLASH_USER_END_ADDR)
+    {
+      if((*(__IO uint32_t*) Address) != DATA_32)
+      {
+        MemoryProgramStatus = FAILED;
+      }
+      Address += 4;
+    }
+  }
+  else
+  { 
+    /*所需页面受写保护 */ 
+    /* 检查是否允许在此页面中写入 */
+    Address = FLASH_USER_START_ADDR;
+    if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, Address, DATA_32) != HAL_OK)
+    {
+      /* 编程期间返回错误。 */
+      /* 检查WRPERR标志是否设置良好 */
+      if (HAL_FLASH_GetError() == HAL_FLASH_ERROR_WRP) 
+      {
+        MemoryProgramStatus = FAILED;
+      }
+      else
+      {
+        while (1)
+        {
+          LED1_ON;
+          
+          printf("运行失败\r\n");
+        }
+      }
+    }
+    else
+    {
+      while (1)
+      {
+        LED1_ON
+        printf("运行失败\r\n");
+      }
+    }
+  }
+  HAL_FLASH_Lock();
+
+  /*检查程序数据是否存在问题*/
+  if (MemoryProgramStatus == PASSED)
+  {
+    LED2_ON
+  }
+  else
+  {
+    while (1)
+    {
+      LED1_ON
+      printf("运行失败\r\n");
+    }
+  }
+
+  while (1)
+  {
+  }
 }
 
 

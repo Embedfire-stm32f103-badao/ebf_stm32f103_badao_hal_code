@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>串口</TargetName>
+      <TargetName>FLASH</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060528::V5.06 update 5 (build 528)::ARMCC</pCCUsed>
@@ -644,6 +644,11 @@
               <FileName>bsp_debug_usart.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\User\usart\bsp_debug_usart.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_readWriteProtect.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\protect\bsp_readWriteProtect.c</FilePath>
             </File>
           </Files>
         </Group>
