@@ -7,7 +7,7 @@
 
   <Targets>
     <Target>
-      <TargetName>Flash文件系统</TargetName>
+      <TargetName>sd</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060528::V5.06 update 5 (build 528)::ARMCC</pCCUsed>
@@ -646,9 +646,19 @@
               <FilePath>..\User\usart\bsp_debug_usart.c</FilePath>
             </File>
             <File>
-              <FileName>bsp_spi_flash.c</FileName>
+              <FileName>bsp_sdio_sdcard.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\flash\bsp_spi_flash.c</FilePath>
+              <FilePath>..\User\sdio\bsp_sdio_sdcard.c</FilePath>
+            </File>
+            <File>
+              <FileName>sdio_test.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\sdio\sdio_test.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\key\bsp_key.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -659,26 +669,6 @@
               <FileName>readme.txt</FileName>
               <FileType>5</FileType>
               <FilePath>..\Doc\readme.txt</FilePath>
-            </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>FatFS</GroupName>
-          <Files>
-            <File>
-              <FileName>diskio.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\FATFS\diskio.c</FilePath>
-            </File>
-            <File>
-              <FileName>ff.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\FATFS\ff.c</FilePath>
-            </File>
-            <File>
-              <FileName>cc936.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\User\FATFS\option\cc936.c</FilePath>
             </File>
           </Files>
         </Group>
