@@ -858,8 +858,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\sdio\sdio_test.c</PathWithFileName>
-      <FilenameWithoutPath>sdio_test.c</FilenameWithoutPath>
+      <PathWithFileName>..\vs1053\VS1053.c</PathWithFileName>
+      <FilenameWithoutPath>VS1053.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

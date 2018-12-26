@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xE</Define>
               <Undefine></Undefine>
-              <IncludePath>..\Libraries\CMSIS\Include;..\Libraries\CMSIS\Device\ST\STM32F1xx\Include;..\Libraries\STM32F1xx_HAL_Driver\Inc;..\User;..\User\led;..\User\FatFs;..\User\FatFs\option;..\User\FatFs\drivers</IncludePath>
+              <IncludePath>..\Libraries\CMSIS\Include;..\Libraries\CMSIS\Device\ST\STM32F1xx\Include;..\Libraries\STM32F1xx_HAL_Driver\Inc;..\User;..\User\led;..\User\FatFs;..\User\FatFs\option;..\User\FatFs\drivers;..\vs1053</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -651,9 +651,9 @@
               <FilePath>..\User\sdio\bsp_sdio_sdcard.c</FilePath>
             </File>
             <File>
-              <FileName>sdio_test.c</FileName>
+              <FileName>VS1053.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\sdio\sdio_test.c</FilePath>
+              <FilePath>..\vs1053\VS1053.c</FilePath>
             </File>
             <File>
               <FileName>bsp_key.c</FileName>

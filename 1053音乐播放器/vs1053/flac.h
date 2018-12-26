@@ -1,3 +1,7 @@
+
+#ifndef __FLAC_H__
+#define __FLAC_H__
+
 #define VS1053B_PATCHLEN  5433  //with FLAC decoder       
  //VS1053B: Patches with FLAC decoder 1.1 (2009-06-23) 
  const unsigned short vs1053b_patch[VS1053B_PATCHLEN] = 
@@ -684,7 +688,7 @@
    0x0300 
  }; 
 
-
+#endif
 
 
 

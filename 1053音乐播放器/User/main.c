@@ -25,8 +25,14 @@
 #include "./FatFS/ff.h"
 #include "./FatFS/ff_gen_drv.h"
 #include "./FatFS/drivers/sd_diskio.h"
+#include  "VS1053.h"
+#include "string.h"
+#include "flac.h"
 
 static void printf_fatfs_error(FRESULT fresult);
+
+uint8_t  buffer[BUFSIZE];
+
 /**
   ******************************************************************************
   *                              定义变量
@@ -36,10 +42,12 @@ char SDPath[4];                   /* SD卡逻辑设备路径 */
 FATFS fs;													/* FatFs文件系统对象 */
 FIL file;													/* 文件对象 */
 FRESULT f_res;                    /* 文件操作结果 */
-UINT fnum;            					  /* 文件成功读写数量 */
-BYTE ReadBuffer[1024]={0};        /* 读缓冲区 */
-BYTE WriteBuffer[]= "欢迎使用野火STM32开发板 今天是个好日子，新建文件系统测试文件\r\n";
-
+//UINT fnum;            					  /* 文件成功读写数量 */
+//BYTE ReadBuffer[1024]={0};        /* 读缓冲区 */
+//BYTE WriteBuffer[]= "欢迎使用野火STM32开发板 今天是个好日子，新建文件系统测试文件\r\n";
+//FRESULT f_res;
+//FIL file;
+UINT bw;
 
 /**
   * @brief  主函数
@@ -65,105 +73,166 @@ int main(void)
   printf("\r\r\n****** 这是一个SD卡 文件系统实验 ******\r\r\n");
   
 	 /* 注册一个FatFS设备：SD卡 */
-  if(FATFS_LinkDriver(&SD_Driver, SDPath) == 0)
-  {
+   FATFS_LinkDriver(&SD_Driver, SDPath);
+ 
     //在SD卡挂载文件系统，文件系统挂载时会对SD卡初始化
     f_res = f_mount(&fs,(TCHAR const*)SDPath,1);
     printf_fatfs_error(f_res);
-    /*----------------------- 格式化测试 ---------------------------*/  
-    /* 如果没有文件系统就格式化创建创建文件系统 */
-    if(f_res == FR_NO_FILESYSTEM)
-    {
-      printf("》SD卡还没有文件系统，即将进行格式化...\r\n");
-      /* 格式化 */
-      f_res=f_mkfs((TCHAR const*)SDPath,0,0);							
-      
-      if(f_res == FR_OK)
-      {
-        printf("》SD卡已成功格式化文件系统。\r\n");
-        /* 格式化后，先取消挂载 */
-        f_res = f_mount(NULL,(TCHAR const*)SDPath,1);			
-        /* 重新挂载	*/			
-        f_res = f_mount(&fs,(TCHAR const*)SDPath,1);
-      }
-      else
-      {
-        printf("《《格式化失败。》》\r\n");
-        while(1);
-      }
-    }
-    else if(f_res!=FR_OK)
-    {
-      printf("！！SD卡挂载文件系统失败。(%d)\r\n",f_res);
-      printf_fatfs_error(f_res);
-      while(1);
-    }
-    else
-    {
-      printf("》文件系统挂载成功，可以进行读写测试\r\n");
-    }
-    
-    /*----------------------- 文件系统测试：写测试 -----------------------------*/
-    /* 打开文件，如果文件不存在则创建它 */
-    printf("****** 即将进行文件写入测试... ******\r\n");	
-    f_res = f_open(&file, "FatFs读写测试文件.txt",FA_CREATE_ALWAYS | FA_WRITE );
-    if ( f_res == FR_OK )
-    {
-      printf("》打开/创建FatFs读写测试文件.txt文件成功，向文件写入数据。\r\n");
-      /* 将指定存储区内容写入到文件内 */
-      f_res=f_write(&file,WriteBuffer,sizeof(WriteBuffer),&fnum);
-      if(f_res==FR_OK)
-      {
-        printf("》文件写入成功，写入字节数据：%d\r\n",fnum);
-        printf("》向文件写入的数据为：\r\n%s\r\n",WriteBuffer);
-      }
-      else
-      {
-        printf("！！文件写入失败：(%d)\r\n",f_res);
-      }    
-      /* 不再读写，关闭文件 */
-      f_close(&file);
-    }
-    else
-    {	
-      printf("！！打开/创建文件失败。\r\n");
-    }
-    
-    /*------------------- 文件系统测试：读测试 ------------------------------------*/
-    printf("****** 即将进行文件读取测试... ******\r\n");
-    f_res = f_open(&file, "FatFs读写测试文件.txt", FA_OPEN_EXISTING | FA_READ); 	 
-    if(f_res == FR_OK)
-    {
-      printf("》打开文件成功。\r\n");
-      f_res = f_read(&file, ReadBuffer, sizeof(ReadBuffer), &fnum); 
-      if(f_res==FR_OK)
-      {
-        printf("》文件读取成功,读到字节数据：%d\r\n",fnum);
-        printf("》读取得的文件数据为：\r\n%s \r\n", ReadBuffer);	
-      }
-      else
-      {
-        printf("！！文件读取失败：(%d)\r\n",f_res);
-      }		
-    }
-    else
-    {
-      printf("！！打开文件失败。\r\n");
-    }
-    /* 不再读写，关闭文件 */
-    f_close(&file);
-    
-    /* 不再使用，取消挂载 */
-    f_res = f_mount(NULL,(TCHAR const*)SDPath,1);	
-  } 
-  /* 注销一个FatFS设备：SD卡 */
+   	VS_Init(); 
+    printf("vs1053:%4X\n",VS_Ram_Test());
+    HAL_Delay(100);
+    VS_Sine_Test();	
+    VS_HD_Reset();
+    VS_Soft_Reset();
+	
+	while(1)
+	{
+		// 测试歌曲放在外部FLASH W25Q64中
+		vs1053_player_song("music/TestFile.mp3");
+		printf("MusicPlay End\n");
+	}
+	
+}
+
+//FRESULT f_res;
+//FIL file;
+//UINT bw;
+
+uint8_t  buffer[BUFSIZE];
+
+//播放歌曲
+void vs1053_player_song(uint8_t *filepath)
+{
+	uint16_t i=0;
+	
+	VS_Restart_Play();  					
+	VS_Set_All();        							 
+	VS_Reset_DecodeTime();
+	
+	if(strstr((const char*)filepath,".flac")||strstr((const char*)filepath,".FLAC"))
+		VS_Load_Patch((uint16_t*)vs1053b_patch,VS1053B_PATCHLEN);
+	
+	f_res=f_open(&file,(const TCHAR*)filepath,FA_READ);
+
+	if(f_res==0)
+	{ 
+		VS_SPI_SpeedHigh();				   
+		while(1)
+		{
+			i=0;	
+			f_res=f_read(&file,buffer,BUFSIZE,(UINT*)&bw);		
+			do
+			{  	
+				if(VS_Send_MusicData(buffer+i)==0)
+				{
+					i+=32;
+				}
+			}while(i<bw);
+			
+			if(bw!=BUFSIZE||f_res!=0)
+			{
+				break;	  
+			}
+			LED2_TOGGLE;
+		}
+		 /* 注销一个FatFS设备：SD卡 */
   FATFS_UnLinkDriver(SDPath);
+	}	  					     	  
+}   
+//    /*----------------------- 格式化测试 ---------------------------*/  
+//    /* 如果没有文件系统就格式化创建创建文件系统 */
+//    if(f_res == FR_NO_FILESYSTEM)
+//    {
+////      printf("》SD卡还没有文件系统，即将进行格式化...\r\n");
+////      /* 格式化 */
+////      f_res=f_mkfs((TCHAR const*)SDPath,0,0);							
+////      
+////      if(f_res == FR_OK)
+////      {
+////        printf("》SD卡已成功格式化文件系统。\r\n");
+////        /* 格式化后，先取消挂载 */
+////        f_res = f_mount(NULL,(TCHAR const*)SDPath,1);			
+////        /* 重新挂载	*/			
+////        f_res = f_mount(&fs,(TCHAR const*)SDPath,1);
+//      }
+//    else
+//    {
+//      printf("《《格式化失败。》》\r\n");
+//      while(1);
+//    }
+//    }
+//    else if(f_res!=FR_OK)
+//    {
+//      printf("！！SD卡挂载文件系统失败。(%d)\r\n",f_res);
+//      printf_fatfs_error(f_res);
+//      while(1);
+//    }
+//    else
+//    {
+//      printf("》文件系统挂载成功，可以进行读写测试\r\n");
+//    }
+//    
+//    /*----------------------- 文件系统测试：写测试 -----------------------------*/
+//    /* 打开文件，如果文件不存在则创建它 */
+//    printf("****** 即将进行文件写入测试... ******\r\n");	
+//    f_res = f_open(&file, "FatFs读写测试文件.txt",FA_CREATE_ALWAYS | FA_WRITE );
+//    if ( f_res == FR_OK )
+//    {
+//      printf("》打开/创建FatFs读写测试文件.txt文件成功，向文件写入数据。\r\n");
+//      /* 将指定存储区内容写入到文件内 */
+//      f_res=f_write(&file,WriteBuffer,sizeof(WriteBuffer),&fnum);
+//      if(f_res==FR_OK)
+//      {
+//        printf("》文件写入成功，写入字节数据：%d\r\n",fnum);
+//        printf("》向文件写入的数据为：\r\n%s\r\n",WriteBuffer);
+//      }
+//      else
+//      {
+//        printf("！！文件写入失败：(%d)\r\n",f_res);
+//      }    
+//      /* 不再读写，关闭文件 */
+//      f_close(&file);
+//    }
+//    else
+//    {	
+//      printf("！！打开/创建文件失败。\r\n");
+//    }
+//    
+//    /*------------------- 文件系统测试：读测试 ------------------------------------*/
+//    printf("****** 即将进行文件读取测试... ******\r\n");
+//    f_res = f_open(&file, "FatFs读写测试文件.txt", FA_OPEN_EXISTING | FA_READ); 	 
+//    if(f_res == FR_OK)
+//    {
+//      printf("》打开文件成功。\r\n");
+//      f_res = f_read(&file, ReadBuffer, sizeof(ReadBuffer), &fnum); 
+//      if(f_res==FR_OK)
+//      {
+//        printf("》文件读取成功,读到字节数据：%d\r\n",fnum);
+//        printf("》读取得的文件数据为：\r\n%s \r\n", ReadBuffer);	
+//      }
+//      else
+//      {
+//        printf("！！文件读取失败：(%d)\r\n",f_res);
+//      }		
+//    }
+//    else
+//    {
+//      printf("！！打开文件失败。\r\n");
+//    }
+//    /* 不再读写，关闭文件 */
+//    f_close(&file);
+//    
+//    /* 不再使用，取消挂载 */
+//    f_res = f_mount(NULL,(TCHAR const*)SDPath,1);	
+//  } 
+  /* 注销一个FatFS设备：SD卡 */
+//  FATFS_UnLinkDriver(SDPath);
   
   /* 无限循环 */
-  while (1)
-  {
-  }
-}
+//  while (1)
+//  {
+//  }
+//}
 
 /**
   * @brief  打印输出信息
