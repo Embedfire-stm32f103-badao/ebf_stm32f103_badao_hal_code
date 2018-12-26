@@ -3,7 +3,6 @@
 
 #include "stm32f1xx.h"
 
-
 //////////////////////////////////////////////////////////////
 /*定义SPI2作为VS1053的硬件接口*/
 
@@ -31,18 +30,6 @@ extern SPI_HandleTypeDef SpiHandle;
 #define VS_GPIO_RST_PORT			GPIOC											/* GPIO端口 */
 #define VS_RST								GPIO_PIN_3								/*定义VS1053的RST管脚*/
 
-
-//#define VS_DREQ_IN						GPIO_ReadInputDataBit(VS_GPIO_DREQ_PORT,VS_DREQ)
-
-//#define VS_XDCS_SET						GPIO_SetBits(VS_GPIO_XDCS_PORT,VS_XDCS)
-//#define VS_XDCS_CLR						GPIO_ResetBits(VS_GPIO_XDCS_PORT,VS_XDCS)
-
-//#define VS_XCS_SET						GPIO_SetBits(VS_SPIGPIO_PORT,VS_XCS)
-//#define VS_XCS_CLR						GPIO_ResetBits(VS_SPIGPIO_PORT,VS_XCS)
-
-//#define VS_RST_SET						GPIO_SetBits(VS_GPIO_RST_PORT,VS_RST)
-//#define VS_RST_CLR						GPIO_ResetBits(VS_GPIO_RST_PORT,VS_RST)
-
 #define VS_GPIO_DREQ_PORT			GPIOE											/* GPIO端口 */
 #define VS_DREQ								GPIO_PIN_3								/*定义VS1053的DREQ管脚*/
 
@@ -64,38 +51,6 @@ extern SPI_HandleTypeDef SpiHandle;
 #define	digitalH(p,i)			{p->BSRR=i;}			  //设置为高电平		
 #define digitalL(p,i)			{p->BSRR=(uint32_t)i << 16;}				//输出低电平
 
-
-//#define VS_XCS								GPIO_PIN_12								/*定义VS1053的片选管脚*/
-//#define VS_SCLK								GPIO_PIN_13								/*定义VS1053的时钟管脚*/
-//#define VS_MISO								GPIO_PIN_14								/*定义VS1053的MISO管脚*/
-//#define VS_MOSI								GPIO_PIN_15								/*定义VS1053的MOSI管脚*/
-//#define VS_SPIGPIO_PORT				GPIOB											/* GPIO端口 */
-//#define VS_SPIGPIO_CLK				RCC_APB2Periph_GPIOB			/* GPIO端口时钟 */
-//#define VS_SPI								SPI2
-//#define VS_SPI_CLK						RCC_APB1Periph_SPI2
-
-//#define VS_XDCS								GPIO_PIN_6								/*定义VS1053的片选管脚*/
-//#define VS_GPIO_XDCS_PORT			GPIOE											/* GPIO端口 */
-//#define VS_GPIO_XDCS_CLK			RCC_APB2Periph_GPIOE			/* GPIO端口时钟 */
-
-//#define VS_GPIO_RST_PORT			GPIOC											/* GPIO端口 */
-//#define VS_GPIO_RST_CLK				RCC_APB2Periph_GPIOC					/* GPIO端口时钟 */
-//#define VS_RST								GPIO_PIN_3								/*定义VS1053的RST管脚*/
-
-//#define VS_GPIO_DREQ_PORT			GPIOE											/* GPIO端口 */
-//#define VS_GPIO_DREQ_CLK			RCC_APB2Periph_GPIOE			/* GPIO端口时钟 */
-//#define VS_DREQ								GPIO_PIN_3								/*定义VS1053的DREQ管脚*/
-
-//#define VS_DREQ_IN						GPIO_ReadInputDataBit(VS_GPIO_DREQ_PORT,VS_DREQ)
-
-//#define VS_XDCS_SET						GPIO_SetBits(VS_GPIO_XDCS_PORT,VS_XDCS)
-//#define VS_XDCS_CLR						GPIO_ResetBits(VS_GPIO_XDCS_PORT,VS_XDCS)
-
-//#define VS_XCS_SET						GPIO_SetBits(VS_SPIGPIO_PORT,VS_XCS)
-//#define VS_XCS_CLR						GPIO_ResetBits(VS_SPIGPIO_PORT,VS_XCS)
-
-//#define VS_RST_SET						GPIO_SetBits(VS_GPIO_RST_PORT,VS_RST)
-//#define VS_RST_CLR						GPIO_ResetBits(VS_GPIO_RST_PORT,VS_RST)
 //////////////////////////////////////////////////////////////
 
 __packed typedef struct 

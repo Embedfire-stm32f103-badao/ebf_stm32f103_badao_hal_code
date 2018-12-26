@@ -612,59 +612,6 @@ void VS_Set_All(void)
 	VS_Set_Bass(vsset.bflimit,vsset.bass,vsset.tflimit,vsset.treble);  
 	VS_Set_Effect(vsset.effect);	//设置空间效果
 }
-///*--------------  以上是VS1053驱动部分 -------------------------*/
-///*--------------  下面开始是音乐播放部分 -------------------------*/
-//#include "ff.h"
-//#include "bsp_led.h"   
-///*
-//************************************************************************
-//*						  FatFs
-//************************************************************************
-//*/
-//FRESULT result;
-//FIL file;
-//UINT bw;
 
-//static uint8_t  buffer[BUFSIZE];
-
-////播放歌曲
-//void vs1053_player_song(uint8_t *filepath)
-//{
-//	uint16_t i=0;
-//	
-//	VS_Restart_Play();  					
-//	VS_Set_All();        							 
-//	VS_Reset_DecodeTime();
-//	
-//	if(strstr((const char*)filepath,".flac")||strstr((const char*)filepath,".FLAC"))
-//		VS_Load_Patch((uint16_t*)vs1053b_patch,VS1053B_PATCHLEN);
-//	
-//	result=f_open(&file,(const TCHAR*)filepath,FA_READ);
-
-//	if(result==0)
-//	{ 
-//		VS_SPI_SpeedHigh();				   
-//		while(1)
-//		{
-//			i=0;	
-//			result=f_read(&file,buffer,BUFSIZE,(UINT*)&bw);		
-//			do
-//			{  	
-//				if(VS_Send_MusicData(buffer+i)==0)
-//				{
-//					i+=32;
-//				}
-//			}while(i<bw);
-//			
-//			if(bw!=BUFSIZE||result!=0)
-//			{
-//				break;	  
-//			}
-//			LED2_TOGGLE;
-//		}
-//		 /* 注销一个FatFS设备：SD卡 */
-//  FATFS_UnLinkDriver(SDPath);
-//	}	  					     	  
-//}
 
 /*--------------  END OF FILE -----------------------*/
