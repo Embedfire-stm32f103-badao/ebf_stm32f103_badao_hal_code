@@ -44,7 +44,6 @@ int main(void)
   DEBUG_USART_Config();
 
   ILI9341_Init ();             //LCD 初始化
-	
 	printf("\r\n ********** 液晶屏中文显示程序（字库在外部FLASH）*********** \r\n"); 
 	printf("\r\n 若汉字显示不正常，请阅读工程中的readme.txt文件说明，根据要求给FLASH重刷字模数据\r\n"); 
 
@@ -228,7 +227,6 @@ void Printf_Charater(void)
 	}   
 	printf("\n\n"); 		//一个字输出完毕
 }   
-
 
 /**
   * @brief  System Clock Configuration

@@ -336,7 +336,7 @@
               <MiscControls></MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xE</Define>
               <Undefine></Undefine>
-              <IncludePath>..\Libraries\CMSIS\Include;..\Libraries\CMSIS\Device\ST\STM32F1xx\Include;..\Libraries\STM32F1xx_HAL_Driver\Inc;..\User;..\User\led;..\User\FatFs;..\User\FatFs\option;..\User\FatFs\drivers</IncludePath>
+              <IncludePath>..\Libraries\CMSIS\Include;..\Libraries\CMSIS\Device\ST\STM32F1xx\Include;..\Libraries\STM32F1xx_HAL_Driver\Inc;..\User;..\User\led;..\STM32_USB_Device_Library\Class\MSC\Inc;..\STM32_USB_Device_Library\Core\Inc</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -651,9 +651,19 @@
               <FilePath>..\User\sdio\bsp_sdio_sdcard.c</FilePath>
             </File>
             <File>
-              <FileName>VS1053.c</FileName>
+              <FileName>usbd_desc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\vs1053\VS1053.c</FilePath>
+              <FilePath>..\User\usbd_desc.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_conf.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\usbd_conf.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_storage.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\usbd_storage.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -668,32 +678,47 @@
           </Files>
         </Group>
         <Group>
-          <GroupName>FatFs</GroupName>
+          <GroupName>STM32_USBD_Library/Class/MSC</GroupName>
           <Files>
             <File>
-              <FileName>diskio.c</FileName>
+              <FileName>usbd_msc.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\FATFS\diskio.c</FilePath>
+              <FilePath>..\STM32_USB_Device_Library\Class\MSC\Src\usbd_msc.c</FilePath>
             </File>
             <File>
-              <FileName>ff.c</FileName>
+              <FileName>usbd_msc_bot.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\FATFS\ff.c</FilePath>
+              <FilePath>..\STM32_USB_Device_Library\Class\MSC\Src\usbd_msc_bot.c</FilePath>
             </File>
             <File>
-              <FileName>sd_diskio.c</FileName>
+              <FileName>usbd_msc_data.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\FatFs\drivers\sd_diskio.c</FilePath>
+              <FilePath>..\STM32_USB_Device_Library\Class\MSC\Src\usbd_msc_data.c</FilePath>
             </File>
             <File>
-              <FileName>ff_gen_drv.c</FileName>
+              <FileName>usbd_msc_scsi.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\FatFs\ff_gen_drv.c</FilePath>
+              <FilePath>..\STM32_USB_Device_Library\Class\MSC\Src\usbd_msc_scsi.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>STM32_USBD_Library/Core</GroupName>
+          <Files>
+            <File>
+              <FileName>usbd_core.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STM32_USB_Device_Library\Core\Src\usbd_core.c</FilePath>
             </File>
             <File>
-              <FileName>cc936.c</FileName>
+              <FileName>usbd_ctlreq.c</FileName>
               <FileType>1</FileType>
-              <FilePath>..\User\FatFs\option\cc936.c</FilePath>
+              <FilePath>..\STM32_USB_Device_Library\Core\Src\usbd_ctlreq.c</FilePath>
+            </File>
+            <File>
+              <FileName>usbd_ioreq.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\STM32_USB_Device_Library\Core\Src\usbd_ioreq.c</FilePath>
             </File>
           </Files>
         </Group>

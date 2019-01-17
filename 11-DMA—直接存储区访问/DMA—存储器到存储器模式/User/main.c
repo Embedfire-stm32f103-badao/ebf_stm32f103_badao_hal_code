@@ -68,7 +68,7 @@ int main(void)
 	DMA_Config(); 
   
 	/* 等待DMA传输完成 */
-	while(__HAL_DMA_GET_FLAG(&DMA_Handle,DMA_FLAG_TC4)==DISABLE)
+	while(__HAL_DMA_GET_FLAG(&DMA_Handle,DMA_FLAG_TC6)==DISABLE)
 	{
 
 	}   
@@ -106,7 +106,7 @@ static void DMA_Config(void)
 {
 	HAL_StatusTypeDef DMA_status = HAL_ERROR; 
   
-  
+  DMA_STREAM_CLOCK()；
   DMA_Handle.Instance=DMA_STREAM;                            //数据流选择
                              
   DMA_Handle.Init.Direction=DMA_MEMORY_TO_MEMORY;             //存储器到外设HAL_DMA_Init(&DMA_Handle);
@@ -172,9 +172,9 @@ uint8_t Buffercmp(const uint32_t* pBuffer,
   *            APB1 Prescaler                 = 2
   *            APB2 Prescaler                 = 1
   *            HSE Frequency(Hz)              = 8000000
-  *            HSE PREDIV1                    = 2
+  *            HSE PREDIV1                    = 1
   *            PLLMUL                         = 9
-  *            Flash Latency(WS)              = 0
+  *            Flash Latency(WS)              = 2
   * @param  None
   * @retval None
   */

@@ -315,9 +315,9 @@ __weak void BSP_SD_MspInit(void *Params)
 //  gpioinitstruct.Pin       = SD_DETECT_PIN;
 //  HAL_GPIO_Init(SD_DETECT_GPIO_PORT, &gpioinitstruct);
     
-//  /* NVIC configuration for SDIO interrupts */
-//  HAL_NVIC_SetPriority(SDIO_IRQn, 0xC, 0);
-//  HAL_NVIC_EnableIRQ(SDIO_IRQn);
+  /* NVIC configuration for SDIO interrupts */
+  HAL_NVIC_SetPriority(SDIO_IRQn, 0xC, 0);
+  HAL_NVIC_EnableIRQ(SDIO_IRQn);
   
   /* DMA initialization should be done here but , as there is only one channel for RX and TX it is configured and done directly when required*/
 }

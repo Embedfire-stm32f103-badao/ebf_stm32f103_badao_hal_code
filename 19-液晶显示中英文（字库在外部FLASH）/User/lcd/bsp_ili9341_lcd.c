@@ -108,7 +108,6 @@ static void ILI9341_GPIO_Config ( void )
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __HAL_RCC_GPIOE_CLK_ENABLE();
   __HAL_RCC_GPIOF_CLK_ENABLE();
-  __HAL_RCC_GPIOG_CLK_ENABLE();
   __HAL_RCC_FSMC_CLK_ENABLE();			//使能FSMC时钟
   
     /* Common GPIO configuration */
@@ -118,28 +117,25 @@ static void ILI9341_GPIO_Config ( void )
 
   
   GPIO_Initure.Pin=GPIO_PIN_12;
-	HAL_GPIO_Init(GPIOG,&GPIO_Initure);
+	HAL_GPIO_Init(GPIOD,&GPIO_Initure);
   
   //初始化复位引脚G11
-	GPIO_Initure.Pin=GPIO_PIN_11;
-	HAL_GPIO_Init(GPIOG,&GPIO_Initure);
+	GPIO_Initure.Pin=GPIO_PIN_1;
+	HAL_GPIO_Init(GPIOE,&GPIO_Initure);
   
   GPIO_Initure.Mode=GPIO_MODE_AF_PP; 
 //  GPIO_Initure.Alternate=GPIO_AF12_FSMC;	//复用为FSMC
   
 	//初始化PD0,1,4,5,8,9,10,14,15
-	GPIO_Initure.Pin=GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_8|\
-					         GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_14|GPIO_PIN_15; 
+	GPIO_Initure.Pin=GPIO_PIN_0|GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5|GPIO_PIN_7|GPIO_PIN_8|\
+					         GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11|GPIO_PIN_14|GPIO_PIN_15; 
   HAL_GPIO_Init(GPIOD, &GPIO_Initure);
   
   	//初始化PE2,7,8,9,10,11,12,13,14,15
-	GPIO_Initure.Pin=GPIO_PIN_2|GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11|\
+	GPIO_Initure.Pin=  GPIO_PIN_7|GPIO_PIN_8|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11|\
                      GPIO_PIN_12|GPIO_PIN_13|GPIO_PIN_14|GPIO_PIN_15;
 	HAL_GPIO_Init(GPIOE,&GPIO_Initure);
 	
-	//初始化G12
-	GPIO_Initure.Pin=GPIO_PIN_6;
-	HAL_GPIO_Init(GPIOG,&GPIO_Initure);
 
 
 //	/* 使能FSMC对应相应管脚时钟*/
