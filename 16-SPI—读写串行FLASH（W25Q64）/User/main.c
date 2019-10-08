@@ -4,7 +4,7 @@
   * @author  fire
   * @version V1.0
   * @date    2013-xx-xx
-  * @brief   测试led
+  * @brief   8M串行flash测试
   ******************************************************************************
   * @attention
   *
@@ -36,7 +36,7 @@ typedef enum { FAILED = 0, PASSED = !FAILED} TestStatus;
 
    
 /* 发送缓冲区初始化 */
-uint8_t Tx_Buffer[] = "感谢您选用秉火stm32开发板\r\nhttp://firestm32.taobao.com";
+uint8_t Tx_Buffer[] = "感谢您选用野火stm32开发板\r\nhttp://firestm32.taobao.com";
 uint8_t Rx_Buffer[BufferSize];
 
 //读取的ID存储位置
@@ -56,7 +56,7 @@ TestStatus Buffercmp(uint8_t* pBuffer1, uint8_t* pBuffer2, uint16_t BufferLength
  */
 int main(void)
 {   
-  /* 设定系统时钟为180MHz */
+  /* 设定系统时钟为72MHz */
   SystemClock_Config();
 	
 	LED_GPIO_Config();
@@ -65,9 +65,9 @@ int main(void)
 	/* 配置串口1为：115200 8-N-1 */
 	DEBUG_USART_Config();
   
-	printf("\r\n这是一个16M串行flash(W25Q128)实验(SPI驱动) \r\n");
+	printf("\r\n这是一个8M串行flash(W25Q64)实验(SPI驱动) \r\n");
 	
-  /* 16M串行flash W25Q128初始化 */
+  /* 16M串行flash W25Q64初始化 */
 	SPI_FLASH_Init();
 		/* 获取 Flash Device ID */
 	DeviceID = SPI_FLASH_ReadDeviceID();
@@ -101,18 +101,18 @@ int main(void)
 		if( PASSED == TransferStatus1 )
 		{    
 			LED_GREEN;
-			printf("\r\n16M串行flash(W25Q128)测试成功!\n\r");
+			printf("\r\n8M串行flash(W25Q64)测试成功!\n\r");
 		}
 		else
 		{        
 			LED_RED;
-			printf("\r\n16M串行flash(W25Q128)测试失败!\n\r");
+			printf("\r\n8M串行flash(W25Q64)测试失败!\n\r");
 		}
 	}// if (FlashID == sFLASH_ID)
 	else
 	{    
 		LED_RED;
-		printf("\r\n获取不到 W25Q128 ID!\n\r");
+		printf("\r\n获取不到 W25Q64 ID!\n\r");
 	}
 	
 	SPI_Flash_PowerDown();  

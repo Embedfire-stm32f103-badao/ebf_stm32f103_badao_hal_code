@@ -30,7 +30,7 @@
 int main(void)
 {
 	uint8_t wwdg_tr, wwdg_wr;
-    /* 系统时钟初始化成216 MHz */
+    /* 系统时钟初始化成72MHz */
   SystemClock_Config();
 	/* LED 端口初始化 */
 	LED_GPIO_Config();	   

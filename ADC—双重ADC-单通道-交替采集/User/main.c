@@ -35,7 +35,7 @@ uint32_t DMA_Transfer_Complete_Count=0;
   */
 int main(void)
 {   
-  /* 配置系统时钟为216 MHz */
+  /* 配置系统时钟为72MHz */
   SystemClock_Config();
 
   /* 初始化USART1 配置模式为 115200 8-N-1 */

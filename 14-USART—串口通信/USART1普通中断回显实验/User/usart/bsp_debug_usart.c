@@ -99,29 +99,12 @@ int fputc(int ch, FILE *f)
 	return (ch);
 }
 
-////重定向c库函数scanf到串口DEBUG_USART，重写向后可使用scanf、getchar等函数
-//int fgetc(FILE *f)
-//{		
-//	int ch;
-//	HAL_UART_Receive(&UartHandle, (uint8_t *)&ch, 1, 1000);	
-//	return (ch);
-//}
-////重定向c库函数printf到串口USARTx，重定向后可使用printf函数
-//int fputc(int ch, FILE *f)
-//{
-//    /* 发送一个字节数据到串口USARTx */
-//	HAL_UART_Transmit(&UartHandle, (uint8_t *)&ch, 1, 0xFFFF);
-//	return (ch);
-//}
+//重定向c库函数scanf到串口DEBUG_USART，重写向后可使用scanf、getchar等函数
+int fgetc(FILE *f)
+{		
+	int ch;
+	HAL_UART_Receive(&UartHandle, (uint8_t *)&ch, 1, 1000);	
+	return (ch);
+}
 
-////重定向c库函数scanf到串口USARTx，重写向后可使用scanf、getchar等函数
-//int fgetc(FILE *f)
-//{	
-//    int ch;
-//    /* 等待串口输入数据 */
-//    while(__HAL_UART_GET_FLAG(&UartHandle, UART_FLAG_RXNE) ==  RESET);
-////	    __HAL_UART_CLEAR_OREFLAG(&UartHandle);
-//    HAL_UART_Receive(&UartHandle, (uint8_t *)&ch, 1, 1000);
-//    return (ch);
-//}
 /*********************************************END OF FILE**********************/

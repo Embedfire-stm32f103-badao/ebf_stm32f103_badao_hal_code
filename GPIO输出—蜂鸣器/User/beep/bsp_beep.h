@@ -15,7 +15,7 @@
 #define OFF 0
 
 /* 带参宏，可以像内联函数一样使用 */
-#define BEEP(a)	HAL_GPIO_WritePin(BEEP_GPIO_PORT,BEEP_GPIO_PIN,a)
+#define BEEP(a)	 HAL_GPIO_WritePin(BEEP_GPIO_PORT,BEEP_GPIO_PIN,a)
 					
 /* 直接操作寄存器的方法控制IO */
 #define	digitalHi(p,i)			{p->BSRR = i;}			        //设置为高电平		

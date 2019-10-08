@@ -34,7 +34,7 @@ int main(void)
 	char *pbuf;
 	uint16_t len;
     
-  /* 配置系统时钟为216 MHz */
+  /* 配置系统时钟为72MHz */
   SystemClock_Config();
 
   /* 初始化RGB彩灯 */
@@ -47,14 +47,14 @@ int main(void)
 	
 	Key_GPIO_Config();
 	
-	printf("\r\n 欢迎使用秉火  STM32 F103 开发板。\r\n");
-  printf("\r\n 秉火F103 485通讯实验例程\r\n");
+	printf("\r\n 欢迎使用野火  STM32 F103 开发板。\r\n");
+  printf("\r\n 野火F103 485通讯实验例程\r\n");
 	
 	printf("\r\n 实验步骤：\r\n");
 
 	printf("\r\n 1.使用导线连接好两个485通讯设备\r\n");
 	printf("\r\n 2.使用跳线帽连接好:5v --- C/4-5V,485-D --- PD5,485-R ---PD6 \r\n");
-	printf("\r\n 3.若使用两个秉火开发板进行实验，给两个开发板都下载本程序即可。\r\n");
+	printf("\r\n 3.若使用两个野火开发板进行实验，给两个开发板都下载本程序即可。\r\n");
 	printf("\r\n 4.准备好后，按下其中一个开发板的KEY1键，会使用485向外发送0-255的数字 \r\n");
 	printf("\r\n 5.若开发板的485接收到256个字节数据，会把数据以16进制形式打印出来。 \r\n");
 	

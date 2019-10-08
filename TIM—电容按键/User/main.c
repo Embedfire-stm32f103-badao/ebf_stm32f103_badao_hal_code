@@ -20,7 +20,6 @@
 #include "stm32f1xx.h"
 #include "./usart/bsp_debug_usart.h"
 #include <stdlib.h>
-#include "./led/bsp_led.h" 
 #include "./beep/bsp_beep.h" 
 #include "./TouchPad/bsp_touchpad.h"
 
@@ -43,7 +42,7 @@ int main(void)
   /* 初始化USART1 配置模式为 115200 8-N-1 */
   DEBUG_USART_Config();
    
-  printf ( "\r\n秉火STM32 输入捕获电容按键检测实验\r\n" );
+  printf ( "\r\n野火STM32 输入捕获电容按键检测实验\r\n" );
 	printf ( "\r\n触摸电容按键，蜂鸣器则会响\r\n" );
 	
   /* 初始化电容按键获取未被触摸时参数 */

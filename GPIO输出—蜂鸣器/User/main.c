@@ -32,7 +32,7 @@ void Delay(__IO uint32_t nCount)	 //简单的延时函数
   */
 int main(void)
 {
-  /* 系统时钟初始化成216 MHz */
+  /* 系统时钟初始化成72MHz */
   SystemClock_Config();
 
    /* BEEP GPIO 初始化 */
@@ -40,9 +40,9 @@ int main(void)
 	
 	while(1)
 	{		
-		BEEP( ON ); 			  // 响
+		BEEP(ON); 			  // 响
 		Delay(0x0FFFFF);	
-		BEEP( OFF );		  // 不响
+		BEEP(OFF);		  // 不响
 		Delay(0x0FFFFF);
 	}
 }

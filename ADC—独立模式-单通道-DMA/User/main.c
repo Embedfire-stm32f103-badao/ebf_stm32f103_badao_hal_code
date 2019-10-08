@@ -23,7 +23,7 @@
 #include "./led/bsp_led.h" 
 #include "./adc/bsp_adc.h"
 
-// ADC1转换的电压值通过MDA方式传到SRAM
+// ADC1转换的电压值通过DMA方式传到SRAM
 extern __IO uint16_t ADC_ConvertedValue;
 
 // 局部变量，用于保存转换计算后的电压值 	 
@@ -40,7 +40,7 @@ static void Delay(__IO uint32_t nCount)	 //简单的延时函数
   */
 int main(void)
 {   
-    /* 配置系统时钟为216 MHz */
+    /* 配置系统时钟为72MHz */
     SystemClock_Config();
 
     /* 初始化USART1 配置模式为 115200 8-N-1 */

@@ -4,7 +4,7 @@
   * @author  fire
   * @version V1.0
   * @date    2013-xx-xx
-  * @brief   测试led
+  * @brief   测试IO中断翻转LED
   ******************************************************************************
   * @attention
   *
@@ -28,7 +28,7 @@
   */
 int main(void)
 {
-  /* 系统时钟初始化成216 MHz */
+  /* 系统时钟初始化成72MHz */
   SystemClock_Config();
 	/* LED 端口初始化 */
 	LED_GPIO_Config();

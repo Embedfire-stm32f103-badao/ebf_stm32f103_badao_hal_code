@@ -4,7 +4,7 @@
   * @author  fire
   * @version V1.0
   * @date    2013-xx-xx
-  * @brief   测试led
+  * @brief   串口中断接收测试
   ******************************************************************************
   * @attention
   *
@@ -29,7 +29,7 @@
 int main(void)
 {
   HAL_Init();        
-  /* 配置系统时钟为180 MHz */ 
+  /* 配置系统时钟为72MHz */ 
   SystemClock_Config();
 	   
   /*初始化USART 配置模式为 115200 8-N-1，中断接收*/

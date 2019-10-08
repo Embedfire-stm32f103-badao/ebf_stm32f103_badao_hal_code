@@ -4,7 +4,7 @@
   * @author  fire
   * @version V1.0
   * @date    2013-xx-xx
-  * @brief   测试led
+  * @brief   测试定时器中断翻转LED
   ******************************************************************************
   * @attention
   *
@@ -30,12 +30,9 @@ void Delay(__IO uint32_t nCount);
   */
 int main(void)
 {
-
+    // 使用HSI，配置系统时钟为72M
     HSE_SetSysClock();
-        
-    // 使用HSI，配置系统时钟为216M
-    //HSI_SetSysClock(16, 336, 2, 7);
-        
+               
     // LED 端口初始化 
     LED_GPIO_Config();
         

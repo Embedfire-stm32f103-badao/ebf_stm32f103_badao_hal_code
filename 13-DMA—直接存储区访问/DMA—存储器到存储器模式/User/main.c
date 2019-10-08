@@ -106,7 +106,7 @@ static void DMA_Config(void)
 {
 	HAL_StatusTypeDef DMA_status = HAL_ERROR; 
   
-  DMA_STREAM_CLOCK()；
+  DMA_STREAM_CLOCK();
   DMA_Handle.Instance=DMA_STREAM;                            //数据流选择
                              
   DMA_Handle.Init.Direction=DMA_MEMORY_TO_MEMORY;             //存储器到外设HAL_DMA_Init(&DMA_Handle);
