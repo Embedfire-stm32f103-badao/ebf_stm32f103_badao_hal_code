@@ -50,7 +50,6 @@ static void Show_Message(void)
 int main(void)
 {
   char ch;   
-  
   HAL_Init();        
   /* 配置系统时钟为72MHz */ 
   SystemClock_Config();
