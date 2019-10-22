@@ -32,11 +32,8 @@ int main(void)
   SystemClock_Config();
 	/* LED 端口初始化 */
 	LED_GPIO_Config();	 
-  
     /*初始化按键*/
     Key_GPIO_Config();
-	
- 
 	/* 轮询按键状态，若按键按下则反转LED */ 
 	while(1)                            
 	{	   
