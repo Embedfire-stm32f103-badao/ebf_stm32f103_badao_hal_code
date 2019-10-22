@@ -73,9 +73,10 @@ void HAL_UART_MspInit(UART_HandleTypeDef *huart)
   GPIO_InitStruct.Pin = DEBUG_USART_RX_PIN;
   GPIO_InitStruct.Mode=GPIO_MODE_AF_INPUT;	//模式要设置为复用输入模式！	
   HAL_GPIO_Init(DEBUG_USART_RX_GPIO_PORT, &GPIO_InitStruct); 
- 
-  HAL_NVIC_SetPriority(DEBUG_USART_IRQ ,0,1);	//抢占优先级0，子优先级1
-  HAL_NVIC_EnableIRQ(DEBUG_USART_IRQ );		    //使能USART1中断通道  
+   //抢占优先级0，子优先级1
+  HAL_NVIC_SetPriority(DEBUG_USART_IRQ ,0,1);	
+	 //使能USART1中断通道  
+  HAL_NVIC_EnableIRQ(DEBUG_USART_IRQ );		   
 }
 
 
