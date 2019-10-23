@@ -29,14 +29,14 @@ DMA_HandleTypeDef DMA_Handle;
 /* 定义aSRC_Const_Buffer数组作为DMA传输数据源
   const关键字将aSRC_Const_Buffer数组变量定义为常量类型 */
 const uint32_t aSRC_Const_Buffer[BUFFER_SIZE]= {
-                                    0x01020304,0x05060708,0x090A0B0C,0x0D0E0F10,
-                                    0x11121314,0x15161718,0x191A1B1C,0x1D1E1F20,
-                                    0x21222324,0x25262728,0x292A2B2C,0x2D2E2F30,
-                                    0x31323334,0x35363738,0x393A3B3C,0x3D3E3F40,
-                                    0x41424344,0x45464748,0x494A4B4C,0x4D4E4F50,
-                                    0x51525354,0x55565758,0x595A5B5C,0x5D5E5F60,
-                                    0x61626364,0x65666768,0x696A6B6C,0x6D6E6F70,
-                                    0x71727374,0x75767778,0x797A7B7C,0x7D7E7F80};
+		0x01020304,0x05060708,0x090A0B0C,0x0D0E0F10,
+		0x11121314,0x15161718,0x191A1B1C,0x1D1E1F20,
+		0x21222324,0x25262728,0x292A2B2C,0x2D2E2F30,
+		0x31323334,0x35363738,0x393A3B3C,0x3D3E3F40,
+		0x41424344,0x45464748,0x494A4B4C,0x4D4E4F50,
+		0x51525354,0x55565758,0x595A5B5C,0x5D5E5F60,
+		0x61626364,0x65666768,0x696A6B6C,0x6D6E6F70,
+		0x71727374,0x75767778,0x797A7B7C,0x7D7E7F80};
 /* 定义DMA传输目标存储器 */
 uint32_t aDST_Buffer[BUFFER_SIZE];
                                                                        
@@ -54,7 +54,7 @@ int main(void)
 {
 	/* 定义存放比较结果变量 */
 	uint8_t TransferStatus;
-	/* 系统时钟初始化成216 MHz */
+	/* 系统时钟初始化成72 MHz */
 	SystemClock_Config();
 	/* LED 端口初始化 */
 	LED_GPIO_Config();
@@ -70,12 +70,9 @@ int main(void)
 	/* 等待DMA传输完成 */
 	while(__HAL_DMA_GET_FLAG(&DMA_Handle,DMA_FLAG_TC6)==DISABLE)
 	{
-
 	}   
-
 	/* 比较源数据与传输后数据 */
 	TransferStatus=Buffercmp(aSRC_Const_Buffer, aDST_Buffer, BUFFER_SIZE);
-
 	/* 判断源数据与传输后数据比较结果*/
 	if(TransferStatus==0)  
 	{
@@ -87,7 +84,6 @@ int main(void)
 		/* 源数据与传输后数据相等时RGB彩色灯显示蓝色 */
 		LED_BLUE;
 	}
-
 	while (1)
 	{		
 	}
@@ -107,21 +103,26 @@ static void DMA_Config(void)
 	HAL_StatusTypeDef DMA_status = HAL_ERROR; 
   
   DMA_STREAM_CLOCK();
-  DMA_Handle.Instance=DMA_STREAM;                            //数据流选择
-                             
-  DMA_Handle.Init.Direction=DMA_MEMORY_TO_MEMORY;             //存储器到外设HAL_DMA_Init(&DMA_Handle);
-  DMA_Handle.Init.PeriphInc=DMA_PINC_ENABLE;                 //外设非增量模式/* Associate the DMA handle */
-  DMA_Handle.Init.MemInc=DMA_MINC_ENABLE;                     //存储器增量模式__HAL_LINKDMA(&UartHandle, hdmatx, DMA_Handle); 
-  DMA_Handle.Init.PeriphDataAlignment=DMA_PDATAALIGN_WORD;    //外设数据长度:8位
-  DMA_Handle.Init.MemDataAlignment=DMA_MDATAALIGN_WORD;       //存储器数据长度:8位
-  DMA_Handle.Init.Mode=DMA_NORMAL;                            //外设普通模式
-  DMA_Handle.Init.Priority=DMA_PRIORITY_MEDIUM;               //中等优先级
+	 //数据流选择
+  DMA_Handle.Instance=DMA_STREAM;                           
+    //存储器到外设HAL_DMA_Init(&DMA_Handle);
+  DMA_Handle.Init.Direction=DMA_MEMORY_TO_MEMORY;           
+	//外设非增量模式/* Associate the DMA handle */
+  DMA_Handle.Init.PeriphInc=DMA_PINC_ENABLE;                 
+	//存储器增量模式__HAL_LINKDMA(&UartHandle, hdmatx, DMA_Handle);
+  DMA_Handle.Init.MemInc=DMA_MINC_ENABLE;                      
+	//外设数据长度:8位
+  DMA_Handle.Init.PeriphDataAlignment=DMA_PDATAALIGN_WORD;    
+	//存储器数据长度:8位
+  DMA_Handle.Init.MemDataAlignment=DMA_MDATAALIGN_WORD;       
+	//外设普通模式
+  DMA_Handle.Init.Mode=DMA_NORMAL;                            
+	//中等优先级
+  DMA_Handle.Init.Priority=DMA_PRIORITY_MEDIUM;               
   
   /* 完成DMA数据流参数配置 */
 	HAL_DMA_Init(&DMA_Handle);
-
 	DMA_status = HAL_DMA_Start(&DMA_Handle,(uint32_t)aSRC_Const_Buffer,(uint32_t)aDST_Buffer,BUFFER_SIZE);
-  
 	/* 判断DMA状态 */
 	if (DMA_status != HAL_OK)
 	{
