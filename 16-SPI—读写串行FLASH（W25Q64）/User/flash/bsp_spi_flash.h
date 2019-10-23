@@ -64,7 +64,7 @@
 
 
 #define	digitalHi(p,i)			    {p->BSRR=i;}			  //设置为高电平		
-#define digitalLo(p,i)			    {p->BSRR=(uint32_t)i << 16;}				//输出低电平
+#define digitalLo(p,i)			    {p->BSRR=(uint32_t)i << 16;}	//输出低电平
 #define SPI_FLASH_CS_LOW()      digitalLo(FLASH_CS_GPIO_PORT,FLASH_CS_PIN )
 #define SPI_FLASH_CS_HIGH()     digitalHi(FLASH_CS_GPIO_PORT,FLASH_CS_PIN )
 /*SPI接口定义-结尾****************************/

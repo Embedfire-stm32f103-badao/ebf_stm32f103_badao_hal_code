@@ -69,8 +69,6 @@ void HAL_SPI_MspInit(SPI_HandleTypeDef *hspi)
 
 void SPI_FLASH_Init(void)
 {
-   /*##-1- Configure the SPI peripheral #######################################*/
-  /* Set the SPI parameters */
   SpiHandle.Instance               = SPIx;
   SpiHandle.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_4;
   SpiHandle.Init.Direction         = SPI_DIRECTION_2LINES;
