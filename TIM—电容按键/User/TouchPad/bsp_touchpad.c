@@ -31,7 +31,7 @@ __IO uint16_t tpad_default_val=0;
  ***********************************/	
  TIM_HandleTypeDef TIM_Handle;
  
- void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
+void HAL_TIM_Base_MspInit(TIM_HandleTypeDef* htim_base)
 {
   GPIO_InitTypeDef GPIO_InitStruct;
   

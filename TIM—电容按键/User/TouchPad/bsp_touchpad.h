@@ -7,8 +7,6 @@
 #define TOUCHPAD_TIM_PRESCALER              47 //1.5MHz
 // 定义定时器周期
 #define TOUCHPAD_TIM_ARR                     0xFFFF
-
-
 /******************** TPAD 引脚配置参数定义 **************************/
 #define TOUCHPAD_TIMx                        TIM5
 #define TOUCHPAD_TIM_RCC_CLK_ENABLE()        __HAL_RCC_TIM5_CLK_ENABLE()
