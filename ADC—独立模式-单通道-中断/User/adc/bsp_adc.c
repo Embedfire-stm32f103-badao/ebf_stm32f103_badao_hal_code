@@ -22,23 +22,34 @@ static void Rheostat_ADC_GPIO_Config(void)
 
 static void Rheostat_ADC_Mode_Config(void)
 {
-    RCC_PeriphCLKInitTypeDef ADC_CLKInit;
-    // 开启ADC时钟
-    ADC_CLKInit.PeriphClockSelection=RCC_PERIPHCLK_ADC;			//ADC外设时钟
-    ADC_CLKInit.AdcClockSelection=RCC_ADCPCLK2_DIV6;			  //分频因子6时钟为72M/6=12MHz
-    HAL_RCCEx_PeriphCLKConfig(&ADC_CLKInit);					      //设置ADC时钟
-   
-    ADC_Handle.Instance=RHEOSTAT_ADC;
-    ADC_Handle.Init.DataAlign=ADC_DATAALIGN_RIGHT;             //右对齐
-    ADC_Handle.Init.ScanConvMode=DISABLE;                      //非扫描模式
-    ADC_Handle.Init.ContinuousConvMode=ENABLE;                 //连续转换
-    ADC_Handle.Init.NbrOfConversion=1;                         //1个转换在规则序列中 也就是只转换规则序列1 
-    ADC_Handle.Init.DiscontinuousConvMode=DISABLE;             //禁止不连续采样模式
-    ADC_Handle.Init.NbrOfDiscConversion=0;                     //不连续采样通道数为0
-    ADC_Handle.Init.ExternalTrigConv=ADC_SOFTWARE_START;       //软件触发
-    HAL_ADC_Init(&ADC_Handle);                                 //初始化 
- 
- //---------------------------------------------------------------------------
+	RCC_PeriphCLKInitTypeDef ADC_CLKInit;
+	// 开启ADC时钟
+	//ADC外设时钟
+	ADC_CLKInit.PeriphClockSelection=RCC_PERIPHCLK_ADC;		
+  //分频因子6时钟为72M/6=12MHz
+	ADC_CLKInit.AdcClockSelection=RCC_ADCPCLK2_DIV6;			
+  //设置ADC时钟
+	HAL_RCCEx_PeriphCLKConfig(&ADC_CLKInit);					      
+
+	ADC_Handle.Instance=RHEOSTAT_ADC;
+	//右对齐
+	ADC_Handle.Init.DataAlign=ADC_DATAALIGN_RIGHT;             
+	//非扫描模式
+	ADC_Handle.Init.ScanConvMode=DISABLE;                      
+	//连续转换
+	ADC_Handle.Init.ContinuousConvMode=ENABLE;                 
+	//1个转换在规则序列中 也就是只转换规则序列1 
+	ADC_Handle.Init.NbrOfConversion=1;                         
+	//禁止不连续采样模式
+	ADC_Handle.Init.DiscontinuousConvMode=DISABLE;             
+	//不连续采样通道数为0
+	ADC_Handle.Init.NbrOfDiscConversion=0;                     
+	//软件触发
+	ADC_Handle.Init.ExternalTrigConv=ADC_SOFTWARE_START;       
+	//初始化
+	HAL_ADC_Init(&ADC_Handle);                                  
+
+ //------------------------------
     ADC_Config.Channel      = RHEOSTAT_ADC_CHANNEL;
     ADC_Config.Rank         = 1;
     // 采样时间间隔	
