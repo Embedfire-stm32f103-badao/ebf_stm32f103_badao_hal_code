@@ -39,6 +39,7 @@
 #include "main.h"
 #include "stm32f1xx_it.h"
 #include "./usart/bsp_debug_usart.h"
+#include "./lcd/bsp_xpt2046_lcd.h"
 
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
