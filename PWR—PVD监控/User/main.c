@@ -20,8 +20,7 @@
 #include "stm32f1xx.h"
 #include "./led/bsp_led.h"
 #include "./usart/bsp_debug_usart.h"
-#include ".\key\bsp_key.h" 
-  
+
 /*
 *【 ！】实验操作：
 * 1.使用外部可调电源，调节成5V输出，连接到实验板引出的 5V<--->GND排针给板子供电；
