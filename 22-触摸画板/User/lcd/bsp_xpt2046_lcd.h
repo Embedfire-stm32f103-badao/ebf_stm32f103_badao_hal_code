@@ -5,45 +5,45 @@
 #include "stm32f1xx.h"
 
 
-/******************************* XPT2046 触摸屏触摸信号指示引脚定义(不使用中断) ***************************/
-#define             XPT2046_PENIRQ_GPIO_PORT                       GPIOF
-#define             XPT2046_PENIRQ_GPIO_PIN                        GPIO_PIN_9
+/* XPT2046 触摸屏触摸信号指示引脚定义(不使用中断)*/
+#define    XPT2046_PENIRQ_GPIO_PORT   GPIOF
+#define    XPT2046_PENIRQ_GPIO_PIN    GPIO_PIN_9
 
 //触屏信号有效电平
-#define             XPT2046_PENIRQ_ActiveLevel                     0
-#define             XPT2046_PENIRQ_Read()                          HAL_GPIO_ReadPin ( XPT2046_PENIRQ_GPIO_PORT, XPT2046_PENIRQ_GPIO_PIN )
+#define   XPT2046_PENIRQ_ActiveLevel       0
+#define   XPT2046_PENIRQ_Read()        HAL_GPIO_ReadPin ( XPT2046_PENIRQ_GPIO_PORT, XPT2046_PENIRQ_GPIO_PIN )
 
 
 
-/******************************* XPT2046 触摸屏模拟SPI引脚定义 ***************************/
+/*XPT2046 触摸屏模拟SPI引脚定义*/
 
-#define             XPT2046_SPI_CS_PIN		                        GPIO_PIN_10
-#define             XPT2046_SPI_CS_PORT		                      GPIOF
+#define    XPT2046_SPI_CS_PIN		          GPIO_PIN_10
+#define    XPT2046_SPI_CS_PORT		        GPIOF
 
-#define	            XPT2046_SPI_CLK_PIN	                        GPIO_PIN_7
-#define             XPT2046_SPI_CLK_PORT	                       GPIOG
+#define	   XPT2046_SPI_CLK_PIN	          GPIO_PIN_7
+#define    XPT2046_SPI_CLK_PORT	          GPIOG
 
-#define	            XPT2046_SPI_MOSI_PIN	                        GPIO_PIN_11
-#define	            XPT2046_SPI_MOSI_PORT	                      GPIOF
+#define	   XPT2046_SPI_MOSI_PIN	          GPIO_PIN_11
+#define	   XPT2046_SPI_MOSI_PORT	        GPIOF
 
-#define	            XPT2046_SPI_MISO_PIN	                        GPIO_PIN_6
-#define	            XPT2046_SPI_MISO_PORT	                      GPIOF
+#define	   XPT2046_SPI_MISO_PIN	          GPIO_PIN_6
+#define	   XPT2046_SPI_MISO_PORT	        GPIOF
 
 
 /* 直接操作寄存器的方法控制IO */
-#define	digitalHi(p,i)			{p->BSRR=i;}			  //设置为高电平		
-#define digitalLo(p,i)			{p->BSRR=(uint32_t)i << 16;}				//输出低电平
+#define	digitalHi(p,i)			{p->BSRR=i;}	//设置为高电平		
+#define digitalLo(p,i)			{p->BSRR=(uint32_t)i << 16;}//输出低电平
 
-#define             XPT2046_CS_ENABLE()                          digitalHi( XPT2046_SPI_CS_PORT, XPT2046_SPI_CS_PIN )    
-#define             XPT2046_CS_DISABLE()                         digitalLo ( XPT2046_SPI_CS_PORT, XPT2046_SPI_CS_PIN )  
+#define   XPT2046_CS_ENABLE()      digitalHi( XPT2046_SPI_CS_PORT, XPT2046_SPI_CS_PIN )    
+#define   XPT2046_CS_DISABLE()     digitalLo ( XPT2046_SPI_CS_PORT, XPT2046_SPI_CS_PIN )  
 
-#define             XPT2046_CLK_HIGH()                           digitalHi ( XPT2046_SPI_CLK_PORT, XPT2046_SPI_CLK_PIN )    
-#define             XPT2046_CLK_LOW()                            digitalLo ( XPT2046_SPI_CLK_PORT, XPT2046_SPI_CLK_PIN ) 
+#define   XPT2046_CLK_HIGH()       digitalHi ( XPT2046_SPI_CLK_PORT, XPT2046_SPI_CLK_PIN )    
+#define   XPT2046_CLK_LOW()        digitalLo ( XPT2046_SPI_CLK_PORT, XPT2046_SPI_CLK_PIN ) 
 
-#define             XPT2046_MOSI_1()                             digitalHi ( XPT2046_SPI_MOSI_PORT, XPT2046_SPI_MOSI_PIN ) 
-#define             XPT2046_MOSI_0()                             digitalLo ( XPT2046_SPI_MOSI_PORT, XPT2046_SPI_MOSI_PIN )
+#define   XPT2046_MOSI_1()         digitalHi ( XPT2046_SPI_MOSI_PORT, XPT2046_SPI_MOSI_PIN ) 
+#define   XPT2046_MOSI_0()         digitalLo ( XPT2046_SPI_MOSI_PORT, XPT2046_SPI_MOSI_PIN )
 
-#define             XPT2046_MISO()                               HAL_GPIO_ReadPin ( XPT2046_SPI_MISO_PORT, XPT2046_SPI_MISO_PIN )
+#define   XPT2046_MISO()           HAL_GPIO_ReadPin ( XPT2046_SPI_MISO_PORT, XPT2046_SPI_MISO_PIN )
 
 
 
