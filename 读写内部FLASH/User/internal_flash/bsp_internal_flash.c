@@ -16,27 +16,10 @@
   */
   
 #include "./internal_flash/bsp_internal_flash.h"   
-#include "./led/bsp_led.h"   
+#include "./usart/bsp_debug_usart.h"
 
 
-#define FLASH_USER_START_ADDR   ADDR_FLASH_PAGE_32   /* Start @ of user Flash area */
-<<<<<<< HEAD
-#define FLASH_USER_END_ADDR     ADDR_FLASH_PAGE_48    /* End @ of user Flash area */
-=======
-#define FLASH_USER_END_ADDR     ADDR_FLASH_PAGE_48  /* End @ of user Flash area */
->>>>>>> remotes/origin/FIRST
 
-#define DATA_32                 ((uint32_t)0x12345678)
-
-uint32_t Address = 0, PAGEError = 0;
-__IO uint32_t data32 = 0 , MemoryProgramStatus = 0;
-
-<<<<<<< HEAD
-/*V用于擦除过程的变量*/
-=======
-/*Variable used for Erase procedure*/
->>>>>>> remotes/origin/FIRST
- FLASH_EraseInitTypeDef EraseInitStruct;
 
 
 /**
@@ -44,152 +27,58 @@ __IO uint32_t data32 = 0 , MemoryProgramStatus = 0;
   * @param  None
   * @retval None
   */
-void InternalFlash_Test(void)
+int InternalFlash_Test(void)
 {
-<<<<<<< HEAD
-	/* 解锁Flash以启用闪存控制寄存器访问*/
-  HAL_FLASH_Unlock();
+	uint32_t EraseCounter = 0x00; 	//记录要擦除多少页
+	uint32_t Address = 0x00;				//记录写入的地址
+	uint32_t Data = 0x3210ABCD;			//记录写入的数据
+	uint32_t NbrOfPage = 0x00;			//记录写入多少页
 
-  /* 删除用户Flash区域*/
-  /* 填充EraseInit结构*/
-=======
-	/* Unlock the Flash to enable the flash control register access *************/
-  HAL_FLASH_Unlock();
+	HAL_StatusTypeDef FLASHStatus = HAL_OK; //记录每次擦除的结果	
+	TestStatus MemoryProgramStatus = PASSED;//记录整个测试结果
+	
 
-  /* Erase the user Flash area
-    (area defined by FLASH_USER_START_ADDR and FLASH_USER_END_ADDR) ***********/
+  /* 解锁 */
+	HAL_FLASH_Unlock();
 
-  /* Fill EraseInit structure*/
->>>>>>> remotes/origin/FIRST
-  EraseInitStruct.TypeErase   = FLASH_TYPEERASE_PAGES;
-  EraseInitStruct.PageAddress = FLASH_USER_START_ADDR;
-  EraseInitStruct.NbPages     = (FLASH_USER_END_ADDR - FLASH_USER_START_ADDR) / FLASH_PAGE_SIZE;
+  /* 计算要擦除多少页 */
+  NbrOfPage = (WRITE_END_ADDR - WRITE_START_ADDR) / FLASH_PAGE_SIZE;
 
-  if (HAL_FLASHEx_Erase(&EraseInitStruct, &PAGEError) != HAL_OK)
+  /* 清空所有标志位 */
+	__HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPERR);	
+
+  /* 按页擦除*/
+  for(EraseCounter = 0; (EraseCounter < NbrOfPage) && (FLASHStatus == HAL_OK); EraseCounter++)
   {
-<<<<<<< HEAD
+    //FLASHStatus = FLASH_ErasePage(WRITE_START_ADDR + (FLASH_PAGE_SIZE * EraseCounter));
     
-    while (1)
-    {
-      LED1_ON;
-      printf("擦除失败\r\n");
-    }
-  }
+	}
+  
+  /* 向内部FLASH写入数据 */
+  Address = WRITE_START_ADDR;
 
-  /* 逐字编程用户Flash区域*/
-=======
-    /*
-      Error occurred while page erase.
-      User can add here some code to deal with this error.
-      PAGEError will contain the faulty page and then to know the code error on this page,
-      user can call function 'HAL_FLASH_GetError()'
-    */
-    /* Infinite loop */
-    while (1)
-    {
-      LED1_ON;
-      /* indicate error in Erase operation */
-     printf("擦除失败\r\n");
-    }
-  }
-
-  /* Program the user Flash area word by word
-    (area defined by FLASH_USER_START_ADDR and FLASH_USER_END_ADDR) ***********/
->>>>>>> remotes/origin/FIRST
-
-  Address = FLASH_USER_START_ADDR;
-
-  while (Address < FLASH_USER_END_ADDR)
+  while((Address < WRITE_END_ADDR) && (FLASHStatus == HAL_OK))
   {
-    if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, Address, DATA_32) == HAL_OK)
-    {
-      Address = Address + 4;
-    }
-    else
-    {
-<<<<<<< HEAD
-      while (1)
-      {
-         LED1_ON;
-=======
-      /* Error occurred while writing data in Flash memory.
-         User can add here some code to deal with this error */
-      while (1)
-      {
-         LED1_ON;
-         /* indicate error in Erase operation */
->>>>>>> remotes/origin/FIRST
-         printf("写入失败\r\n");
-      }
-    }
-  }
-
-<<<<<<< HEAD
-  /*锁定闪存以禁用闪存控制寄存器访问（推荐保护FLASH存储器免受可能的意外操作）*/
-  HAL_FLASH_Lock();
-
-  /* 检查编程数据是否正常
-        MemoryProgramStatus = 0：数据编程正确
-        MemoryProgramStatus！= 0：未正确编程的字数*/
-=======
-  /* Lock the Flash to disable the flash control register access (recommended
-     to protect the FLASH memory against possible unwanted operation) *********/
-  HAL_FLASH_Lock();
-
-  /* Check if the programmed data is OK
-      MemoryProgramStatus = 0: data programmed correctly
-      MemoryProgramStatus != 0: number of words not programmed correctly ******/
->>>>>>> remotes/origin/FIRST
-  Address = FLASH_USER_START_ADDR;
-  MemoryProgramStatus = 0x0;
-
-  while (Address < FLASH_USER_END_ADDR)
-  {
-    data32 = *(__IO uint32_t *)Address;
-
-    if (data32 != DATA_32)
-    {
-      MemoryProgramStatus++;
-    }
+    //FLASHStatus = FLASH_ProgramWord(Address, Data);
     Address = Address + 4;
   }
+  HAL_FLASH_Lock();
 
-<<<<<<< HEAD
-  /*检查程序数据是否存在问题*/
-  if (MemoryProgramStatus == 0)
-  {
-    printf("写入成功\r\n");
-=======
-  /*Check if there is an issue to program data*/
-  if (MemoryProgramStatus == 0)
-  {
-    printf("写入成功\r\n");
-    /* No error detected. Switch on LED2*/
->>>>>>> remotes/origin/FIRST
-    LED2_ON;
-  }
-  else
-  {
-<<<<<<< HEAD
-    while (1)
-    {
-      LED1_ON;
-      printf("失败\r\n");
-    }
-  }
-=======
-    /* Error detected. LED1 will blink with 1s period */
-    while (1)
-    {
-      LED1_ON;
-         /* indicate error in Erase operation */
-      printf("失败\r\n");
-    }
-  }
+  
+  /* 检查写入的数据是否正确 */
+  Address = WRITE_START_ADDR;
 
-  /* Infinite loop */
->>>>>>> remotes/origin/FIRST
-  while (1)
+  while((Address < WRITE_END_ADDR) && (MemoryProgramStatus != FAILED))
   {
+    if((*(__IO uint32_t*) Address) != Data)
+    {
+      MemoryProgramStatus = FAILED;
+    }
+    Address += 4;
   }
+	return MemoryProgramStatus;
 }
+
+
+
+
