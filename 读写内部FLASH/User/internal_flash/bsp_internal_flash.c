@@ -29,48 +29,55 @@
   */
 int InternalFlash_Test(void)
 {
-	uint32_t EraseCounter = 0x00; 	//记录要擦除多少页
-	uint32_t Address = 0x00;				//记录写入的地址
-	uint32_t Data = 0x3210ABCD;			//记录写入的数据
-	uint32_t NbrOfPage = 0x00;			//记录写入多少页
 
-	HAL_StatusTypeDef FLASHStatus = HAL_OK; //记录每次擦除的结果	
+	uint32_t Address = 0x00;				//记录写入的地址
+	uint32_t DATA_32 = 0x3210ABCD;			//记录写入的数据
+	uint32_t NbrOfPage = 0x00;			//记录写入多少页
+	 __IO uint32_t Data32 = 0;
+	
+	
+	uint32_t SECTORError = 0;
 	TestStatus MemoryProgramStatus = PASSED;//记录整个测试结果
 	
 
+	static FLASH_EraseInitTypeDef EraseInitStruct;
   /* 解锁 */
 	HAL_FLASH_Unlock();
 
   /* 计算要擦除多少页 */
   NbrOfPage = (WRITE_END_ADDR - WRITE_START_ADDR) / FLASH_PAGE_SIZE;
+	EraseInitStruct.TypeErase     = FLASH_TYPEERASE_PAGES;
+	EraseInitStruct.NbPages       = NbrOfPage;
+	EraseInitStruct.PageAddress   = WRITE_START_ADDR;
 
-  /* 清空所有标志位 */
-	__HAL_FLASH_CLEAR_FLAG(FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPERR);	
-
-  /* 按页擦除*/
-  for(EraseCounter = 0; (EraseCounter < NbrOfPage) && (FLASHStatus == HAL_OK); EraseCounter++)
-  {
-    //FLASHStatus = FLASH_ErasePage(WRITE_START_ADDR + (FLASH_PAGE_SIZE * EraseCounter));
-    
+  if (HAL_FLASHEx_Erase(&EraseInitStruct, &SECTORError) != HAL_OK)
+	{
+		/*擦除出错，返回，实际应用中可加入处理 */
+		return -1;
 	}
-  
   /* 向内部FLASH写入数据 */
-  Address = WRITE_START_ADDR;
-
-  while((Address < WRITE_END_ADDR) && (FLASHStatus == HAL_OK))
-  {
-    //FLASHStatus = FLASH_ProgramWord(Address, Data);
-    Address = Address + 4;
-  }
+	Address = WRITE_START_ADDR;
+	while (Address < WRITE_END_ADDR)
+	{
+		if (HAL_FLASH_Program(FLASH_TYPEPROGRAM_WORD, Address, DATA_32) == HAL_OK)
+		{
+		  Address = Address + 4;
+		}
+		else
+		{ 
+		  /*写入出错，返回，实际应用中可加入处理 */
+				return -1;
+		}
+	}
+	
   HAL_FLASH_Lock();
 
-  
   /* 检查写入的数据是否正确 */
   Address = WRITE_START_ADDR;
 
   while((Address < WRITE_END_ADDR) && (MemoryProgramStatus != FAILED))
   {
-    if((*(__IO uint32_t*) Address) != Data)
+    if((*(__IO uint32_t*) Address) != DATA_32)
     {
       MemoryProgramStatus = FAILED;
     }

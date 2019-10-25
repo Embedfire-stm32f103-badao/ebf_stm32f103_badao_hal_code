@@ -36,12 +36,30 @@ int main(void)
 	/*初始化LED*/
 	LED_GPIO_Config();
 
-	printf("\r\n 欢迎使用野火  STM32 F103 开发板。\r\n");	
+  LED_BLUE;
+	printf("\r\n 欢迎使用野火  STM32  开发板。\r\n");	
 	printf("正在进行读写内部FLASH实验，请耐心等待\r\n");
 	
-  InternalFlash_Test();
+	if(InternalFlash_Test()== PASSED)
+	{
+		LED_GREEN;
+		printf("读写内部FLASH测试成功\r\n");
+	}
+	else
+	{
+		printf("读写内部FLASH测试失败\r\n");
+		LED_RED;
+	}
+  while(1)
+	{	
+	} 
 }
 
+
+void Delay(__IO uint32_t nCount)
+{
+  for(; nCount != 0; nCount--);
+}
 
 
 /**

@@ -4,8 +4,6 @@
 #include "stm32f1xx.h"
 
 
-//#define FLASH_PAGE_SIZE    ((uint16_t)0x800)	//2048
-
 
 //写入的起始地址与结束地址
 #define WRITE_START_ADDR  ((uint32_t)0x08008000)
