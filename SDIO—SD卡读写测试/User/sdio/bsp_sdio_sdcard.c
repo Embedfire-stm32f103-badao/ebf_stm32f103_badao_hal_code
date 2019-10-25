@@ -32,7 +32,7 @@ uint8_t BSP_SD_Init(void)
 { 
   uint8_t state = MSD_OK;
   
-  /* uSD device interface configuration */
+  /*SD设备接口配置 */
   uSdHandle.Instance = SDIO;
 
   uSdHandle.Init.ClockEdge           = SDIO_CLOCK_EDGE_RISING;
@@ -42,13 +42,7 @@ uint8_t BSP_SD_Init(void)
   uSdHandle.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
   uSdHandle.Init.ClockDiv            = SDIO_TRANSFER_CLK_DIV;
   
-//  /* Check if the SD card is plugged in the slot */
-//  if(BSP_SD_IsDetected() != SD_PRESENT)
-//  {
-//    return MSD_ERROR;
-//  }
-  
-  /* Msp SD initialization */
+  /*  SD初始化 */
   BSP_SD_MspInit(NULL);
 
   if(HAL_SD_Init(&uSdHandle) != HAL_OK)
@@ -56,10 +50,9 @@ uint8_t BSP_SD_Init(void)
     state = MSD_ERROR;
   }
   
-  /* Configure SD Bus width */
+  /* 配置SD总线宽度 */
   if(state == MSD_OK)
   {
-    /* Enable wide operation */
     if(HAL_SD_ConfigWideBusOperation(&uSdHandle, SDIO_BUS_WIDE_4B) != HAL_OK)
     {
       state = MSD_ERROR;
@@ -283,43 +276,27 @@ __weak void BSP_SD_MspInit(void *Params)
 {
   GPIO_InitTypeDef gpioinitstruct = {0};
   
-  /* Enable SDIO clock */
+  /* 使能SDIO时钟 */
   __HAL_RCC_SDIO_CLK_ENABLE();
   
-  /* Enable DMA2 clocks */
+  /* 使能 DMA2时钟 */
   __DMAx_TxRx_CLK_ENABLE();
 
-  /* Enable GPIOs clock */
+  /* 使能 GPIO 时钟 */
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
   __SD_DETECT_GPIO_CLK_ENABLE();
   
-  /* Common GPIO configuration */
   gpioinitstruct.Mode      = GPIO_MODE_AF_PP;
   gpioinitstruct.Pull      = GPIO_PULLUP;
   gpioinitstruct.Speed     = GPIO_SPEED_FREQ_HIGH;
   
-  /* GPIOC configuration */
   gpioinitstruct.Pin = GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12;
    
   HAL_GPIO_Init(GPIOC, &gpioinitstruct);
 
-  /* GPIOD configuration */
   gpioinitstruct.Pin = GPIO_PIN_2;
   HAL_GPIO_Init(GPIOD, &gpioinitstruct);
-
-//  /* SD Card detect pin configuration */
-//  gpioinitstruct.Mode      = GPIO_MODE_INPUT;
-//  gpioinitstruct.Pull      = GPIO_PULLUP;
-//  gpioinitstruct.Speed     = GPIO_SPEED_FREQ_HIGH;
-//  gpioinitstruct.Pin       = SD_DETECT_PIN;
-//  HAL_GPIO_Init(SD_DETECT_GPIO_PORT, &gpioinitstruct);
-    
-//  /* NVIC configuration for SDIO interrupts */
-//  HAL_NVIC_SetPriority(SDIO_IRQn, 0xC, 0);
-//  HAL_NVIC_EnableIRQ(SDIO_IRQn);
-  
-  /* DMA initialization should be done here but , as there is only one channel for RX and TX it is configured and done directly when required*/
 }
 
 /**
