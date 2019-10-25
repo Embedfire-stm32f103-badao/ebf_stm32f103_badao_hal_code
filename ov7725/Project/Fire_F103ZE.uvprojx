@@ -662,6 +662,16 @@
               <FileType>1</FileType>
               <FilePath>..\User\ov7725\bsp_sccb.c</FilePath>
             </File>
+            <File>
+              <FileName>bsp_SysTick.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\SysTick\bsp_SysTick.c</FilePath>
+            </File>
+            <File>
+              <FileName>bsp_key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\User\key\bsp_key.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

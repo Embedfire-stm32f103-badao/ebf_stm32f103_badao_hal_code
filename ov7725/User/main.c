@@ -23,7 +23,12 @@
 #include "./led/bsp_led.h" 
 #include "./lcd/bsp_ili9341_lcd.h"
 #include "./ov7725/bsp_ov7725.h"
+#include "./systick/bsp_SysTick.h"
+#include "./key/bsp_key.h"  
 
+extern uint8_t Ov7725_vsync;
+unsigned int Task_Delay[NumOfTask]; 
+extern OV7725_MODE_PARAM cam_mode;
 
 
 
@@ -38,33 +43,24 @@ void Printf_Charater(void);
   */
 int main(void)
 {
+	float frame_count = 0;
 	uint8_t retry = 0;
   /* 系统时钟初始化成72MHz */
   SystemClock_Config();
+  ILI9341_Init ();             //LCD 初始化
+  ILI9341_GramScan( 3 );
+	LCD_SetFont(&Font8x16);
+	LCD_SetColors(RED,BLACK);
+  ILI9341_Clear(0,0,LCD_X_LENGTH,LCD_Y_LENGTH);	/* 清屏，显示全黑 */
+	/********显示字符串示例*******/
+  ILI9341_DispStringLine_EN(LINE(0),"BH OV7725 Test Demo");
   /* LED 端口初始化 */
   LED_GPIO_Config();	 
   /* 初始化串口 */
   DEBUG_USART_Config();
+	Key_GPIO_Config();
+	SysTick_Init();
 
-  ILI9341_Init ();             //LCD 初始化
-	
-	printf("\r\n ********** 液晶屏英文显示程序*********** \r\n"); 
-	printf("\r\n 本程序不支持中文，显示中文的程序请学习下一章 \r\n"); 
-
-	//其中0、3、5、6 模式适合从左至右显示文字，
- //不推荐使用其它模式显示文字	其它模式显示文字会有镜像效果			
- //其中 6 模式为大部分液晶例程的默认显示方向  
-  ILI9341_GramScan( 3 );
-	LCD_SetFont(&Font8x16);
-	LCD_SetColors(RED,BLACK);
-
-  ILI9341_Clear(0,0,LCD_X_LENGTH,LCD_Y_LENGTH);	/* 清屏，显示全黑 */
-	
-	/********显示字符串示例*******/
-  ILI9341_DispStringLine_EN(LINE(0),"BH OV7725 Test Demo");
-
-	//Key_GPIO_Config();
-	//SysTick_Init();
 	printf("\r\n ** OV7725摄像头实时液晶显示例程** \r\n"); 
 	
 	/* ov7725 gpio 初始化 */
@@ -82,104 +78,121 @@ int main(void)
 			while(1);
 		}
 	}
+	/*根据摄像头参数组配置模式*/
+	OV7725_Special_Effect(cam_mode.effect);
+	/*光照模式*/
+	OV7725_Light_Mode(cam_mode.light_mode);
+	/*饱和度*/
+	OV7725_Color_Saturation(cam_mode.saturation);
+	/*光照度*/
+	OV7725_Brightness(cam_mode.brightness);
+	/*对比度*/
+	OV7725_Contrast(cam_mode.contrast);
+	/*特殊效果*/
+	OV7725_Special_Effect(cam_mode.effect);
+	
+	/*设置图像采样及模式大小*/
+	OV7725_Window_Set(cam_mode.cam_sx,
+										cam_mode.cam_sy,
+										cam_mode.cam_width,
+										cam_mode.cam_height,
+										cam_mode.QVGA_VGA);
+
+	/* 设置液晶扫描模式 */
+	ILI9341_GramScan( cam_mode.lcd_scan );
+	ILI9341_DispStringLine_EN(LINE(2),"OV7725 initialize success!");
+	printf("\r\nOV7725摄像头初始化完成\r\n");
+	
+	Ov7725_vsync = 0;
+	
+	while(1)
+	{
+		/*接收到新图像进行显示*/
+		if( Ov7725_vsync == 2 )
+		{
+			frame_count++;
+			FIFO_PREPARE;  			/*FIFO准备*/					
+			ImagDisp(cam_mode.lcd_sx,
+								cam_mode.lcd_sy,
+								cam_mode.cam_width,
+								cam_mode.cam_height);			/*采集并显示*/
+			
+			Ov7725_vsync = 0;			
+			LED1_TOGGLE;
+
+		}
+		
+		/*检测按键*/
+		if( Key_Scan(KEY1_GPIO_PORT,KEY1_PIN) == KEY_ON  )
+		{
+			/*LED反转*/
+			LED2_TOGGLE;
+
+		} 
+		/*检测按键*/
+		if( Key_Scan(KEY2_GPIO_PORT,KEY2_PIN) == KEY_ON  )
+		{
+			/*LED反转*/
+			LED3_TOGGLE;			
+			
+		/*动态配置摄像头的模式，
+			有需要可以添加使用串口、用户界面下拉选择框等方式修改这些变量，
+			达到程序运行时更改摄像头模式的目的*/
+	
+		cam_mode.QVGA_VGA = 0,	//QVGA模式
+		cam_mode.cam_sx = 0,
+		cam_mode.cam_sy = 0,	
+
+		cam_mode.cam_width = 320,
+		cam_mode.cam_height = 240,
+
+		cam_mode.lcd_sx = 0,
+		cam_mode.lcd_sy = 0,
+		cam_mode.lcd_scan = 3,
+	//LCD扫描模式，本横屏配置可用1、3、5、7模式
+
+		//以下可根据自己的需要调整，参数范围见结构体类型定义	
+		cam_mode.light_mode = 0,//自动光照模式
+		cam_mode.saturation = 0,	
+		cam_mode.brightness = 0,
+		cam_mode.contrast = 0,
+		cam_mode.effect = 1,		//黑白模式
+		
+		/*根据摄像头参数写入配置*/
+		OV7725_Special_Effect(cam_mode.effect);
+		/*光照模式*/
+		OV7725_Light_Mode(cam_mode.light_mode);
+		/*饱和度*/
+		OV7725_Color_Saturation(cam_mode.saturation);
+		/*光照度*/
+		OV7725_Brightness(cam_mode.brightness);
+		/*对比度*/
+		OV7725_Contrast(cam_mode.contrast);
+		/*特殊效果*/
+		OV7725_Special_Effect(cam_mode.effect);
+		
+		/*设置图像采样及模式大小*/
+		OV7725_Window_Set(cam_mode.cam_sx,
+											cam_mode.cam_sy,
+											cam_mode.cam_width,
+											cam_mode.cam_height,
+											cam_mode.QVGA_VGA);
+
+		/* 设置液晶扫描模式 */
+		ILI9341_GramScan( cam_mode.lcd_scan );
+		}
+		
+		/*每隔一段时间计算一次帧率*/
+		if(Task_Delay[0] == 0)  
+		{			
+			printf("\r\nframe_ate = %.2f fps\r\n",frame_count/10);
+			frame_count = 0;
+			Task_Delay[0] = 10000;
+		}
+		
+	}
 }
 
-///*用于测试各种液晶的函数*/
-//void LCD_Test(void)
-//{
-//	/*演示显示变量*/
-//	static uint8_t testCNT = 0;	
-//	char dispBuff[100];
-//	
-//	testCNT++;	
-//	
-//	LCD_SetFont(&Font8x16);
-//	LCD_SetColors(RED,BLACK);
-
-//  ILI9341_Clear(0,0,LCD_X_LENGTH,LCD_Y_LENGTH);	/* 清屏，显示全黑 */
-//	/********显示字符串示例*******/
-//  ILI9341_DispStringLine_EN(LINE(0),"BH 3.2 inch LCD para:");
-//  ILI9341_DispStringLine_EN(LINE(1),"Image resolution:240x320 px");
-//  ILI9341_DispStringLine_EN(LINE(2),"ILI9341 LCD driver");
-//  ILI9341_DispStringLine_EN(LINE(3),"XPT2046 Touch Pad driver");
-//  
-//	/********显示变量示例*******/
-//	LCD_SetFont(&Font16x24);
-//	LCD_SetTextColor(GREEN);
-
-//	/*使用c标准库把变量转化成字符串*/
-//	sprintf(dispBuff,"Count : %d ",testCNT);
-//  LCD_ClearLine(LINE(4));	/* 清除单行文字 */
-//	
-//	/*然后显示该字符串即可，其它变量也是这样处理*/
-//	ILI9341_DispStringLine_EN(LINE(4),dispBuff);
-
-//	/*******显示图形示例******/
-//	LCD_SetFont(&Font24x32);
-//  /* 画直线 */
-//  
-//  LCD_ClearLine(LINE(4));/* 清除单行文字 */
-//	LCD_SetTextColor(BLUE);
-
-//  ILI9341_DispStringLine_EN(LINE(4),"Draw line:");
-//  
-//	LCD_SetTextColor(RED);
-//  ILI9341_DrawLine(50,170,210,230);  
-//  ILI9341_DrawLine(50,200,210,240);
-//  
-//	LCD_SetTextColor(GREEN);
-//  ILI9341_DrawLine(100,170,200,230);  
-//  ILI9341_DrawLine(200,200,220,240);
-//	
-//	LCD_SetTextColor(BLUE);
-//  ILI9341_DrawLine(110,170,110,230);  
-//  ILI9341_DrawLine(130,200,220,240);
-//  
-//  Delay(0xFFFFFF);
-//  
-//  ILI9341_Clear(0,16*8,LCD_X_LENGTH,LCD_Y_LENGTH-16*8);	/* 清屏，显示全黑 */
-//  
-//  
-//  /*画矩形*/
-
-//  LCD_ClearLine(LINE(4));	/* 清除单行文字 */
-//	LCD_SetTextColor(BLUE);
-
-//  ILI9341_DispStringLine_EN(LINE(4),"Draw Rect:");
-
-//	LCD_SetTextColor(RED);
-//  ILI9341_DrawRectangle(50,200,100,30,1);
-//	
-//	LCD_SetTextColor(GREEN);
-//  ILI9341_DrawRectangle(160,200,20,40,0);
-//	
-//	LCD_SetTextColor(BLUE);
-//  ILI9341_DrawRectangle(170,200,50,20,1);
-//  
-//  
-//  Delay(0xFFFFFF);
-//	
-//	ILI9341_Clear(0,16*8,LCD_X_LENGTH,LCD_Y_LENGTH-16*8);	/* 清屏，显示全黑 */
-
-//  /* 画圆 */
-//  LCD_ClearLine(LINE(4));	/* 清除单行文字 */
-//	LCD_SetTextColor(BLUE);
-//	
-//  ILI9341_DispStringLine_EN(LINE(4),"Draw Cir:");
-
-//	LCD_SetTextColor(RED);
-//  ILI9341_DrawCircle(100,200,20,0);
-//	
-//	LCD_SetTextColor(GREEN);
-//  ILI9341_DrawCircle(100,200,10,1);
-//	
-//	LCD_SetTextColor(BLUE);
-//	ILI9341_DrawCircle(140,200,20,0);
-
-//  Delay(0xFFFFFF);
-//  
-//  ILI9341_Clear(0,16*8,LCD_X_LENGTH,LCD_Y_LENGTH-16*8);	/* 清屏，显示全黑 */
-//}
 
 
 /**

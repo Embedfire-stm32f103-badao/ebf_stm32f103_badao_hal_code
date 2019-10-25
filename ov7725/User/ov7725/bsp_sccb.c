@@ -15,9 +15,12 @@ void SCCB_GPIO_Config(void)
   /* SCL(PC6)°¢SDA(PC7)π‹Ω≈≈‰÷√ */
 	
   __HAL_RCC_GPIOC_CLK_ENABLE();
-  GPIO_InitStructure.Pin =  GPIO_PIN_6 | GPIO_PIN_7;
-  GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
-  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_OD;  
+  GPIO_InitStructure.Pin =   GPIO_PIN_7;
+  GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_MEDIUM;//
+  GPIO_InitStructure.Mode = GPIO_MODE_OUTPUT_OD; 
+	HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);
+	
+	GPIO_InitStructure.Pin =  GPIO_PIN_6; 
   HAL_GPIO_Init(GPIOC, &GPIO_InitStructure);
 }
 

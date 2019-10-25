@@ -188,46 +188,46 @@ typedef struct
 /************************** OV7725 连接引脚定义********************************/
 // FIFO 输出使能，即模块中的OE
 
-#define      OV7725_OE_GPIO_PORT                      GPIOA
-#define      OV7725_OE_GPIO_PIN                       GPIO_PIN_3
+#define      OV7725_OE_GPIO_PORT         GPIOA
+#define      OV7725_OE_GPIO_PIN          GPIO_PIN_3
 
 // FIFO 写复位
-#define      OV7725_WRST_GPIO_PORT                    GPIOC
-#define      OV7725_WRST_GPIO_PIN                     GPIO_PIN_4
+#define      OV7725_WRST_GPIO_PORT       GPIOC
+#define      OV7725_WRST_GPIO_PIN        GPIO_PIN_4
 
 // FIFO 读复位
 
-#define      OV7725_RRST_GPIO_PORT                    GPIOA
-#define      OV7725_RRST_GPIO_PIN                     GPIO_PIN_2
+#define      OV7725_RRST_GPIO_PORT       GPIOA
+#define      OV7725_RRST_GPIO_PIN        GPIO_PIN_2
 
 // FIFO 读时钟
 
-#define      OV7725_RCLK_GPIO_PORT                    GPIOC
-#define      OV7725_RCLK_GPIO_PIN                     GPIO_PIN_5
+#define      OV7725_RCLK_GPIO_PORT       GPIOC
+#define      OV7725_RCLK_GPIO_PIN        GPIO_PIN_5
 
 // FIFO 写使能
-#define      OV7725_WE_GPIO_PORT                      GPIOD
-#define      OV7725_WE_GPIO_PIN                       GPIO_PIN_3
+#define      OV7725_WE_GPIO_PORT         GPIOD
+#define      OV7725_WE_GPIO_PIN          GPIO_PIN_3
 
 
 // 8位数据口
-#define      OV7725_DATA_GPIO_PORT                    GPIOB
-#define      OV7725_DATA_0_GPIO_PIN                   GPIO_PIN_8
-#define      OV7725_DATA_1_GPIO_PIN                   GPIO_PIN_9
-#define      OV7725_DATA_2_GPIO_PIN                   GPIO_PIN_10
-#define      OV7725_DATA_3_GPIO_PIN                   GPIO_PIN_11
-#define      OV7725_DATA_4_GPIO_PIN                   GPIO_PIN_12
-#define      OV7725_DATA_5_GPIO_PIN                   GPIO_PIN_13
-#define      OV7725_DATA_6_GPIO_PIN                   GPIO_PIN_14
-#define      OV7725_DATA_7_GPIO_PIN                   GPIO_PIN_15
+#define      OV7725_DATA_GPIO_PORT       GPIOB
+#define      OV7725_DATA_0_GPIO_PIN      GPIO_PIN_8
+#define      OV7725_DATA_1_GPIO_PIN      GPIO_PIN_9
+#define      OV7725_DATA_2_GPIO_PIN      GPIO_PIN_10
+#define      OV7725_DATA_3_GPIO_PIN      GPIO_PIN_11
+#define      OV7725_DATA_4_GPIO_PIN      GPIO_PIN_12
+#define      OV7725_DATA_5_GPIO_PIN      GPIO_PIN_13
+#define      OV7725_DATA_6_GPIO_PIN      GPIO_PIN_14
+#define      OV7725_DATA_7_GPIO_PIN      GPIO_PIN_15
 
 // OV7725场中断
 
-#define      OV7725_VSYNC_GPIO_PORT                   GPIOC
-#define      OV7725_VSYNC_GPIO_PIN                    GPIO_PIN_3
+#define      OV7725_VSYNC_GPIO_PORT      GPIOC
+#define      OV7725_VSYNC_GPIO_PIN       GPIO_PIN_3
 
-#define      OV7725_VSYNC_EXTI_IRQ                    EXTI3_IRQn
-#define      OV7725_VSYNC_EXTI_INT_FUNCTION           EXTI3_IRQHandler
+#define      OV7725_VSYNC_EXTI_IRQ            EXTI3_IRQn
+#define      OV7725_VSYNC_EXTI_INT_FUNCTION   EXTI3_IRQHandler
 
 
 
@@ -273,7 +273,7 @@ typedef struct
 																		
 
 /*信息输出*/
-#define OV7725_DEBUG_ON         0
+#define OV7725_DEBUG_ON         1
 
 #define OV7725_INFO(fmt,arg...)           printf("<<-OV7725-INFO->> "fmt"\n",##arg)
 #define OV7725_ERROR(fmt,arg...)          printf("<<-OV7725-ERROR->> "fmt"\n",##arg)

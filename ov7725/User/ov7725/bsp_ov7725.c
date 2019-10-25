@@ -220,6 +220,7 @@ static void FIFO_GPIO_Config(void)
     GPIO_InitTypeDef GPIO_InitStructure;
 	
 		/*开启时钟*/
+
 	  __HAL_RCC_GPIOA_CLK_ENABLE();
 		__HAL_RCC_GPIOC_CLK_ENABLE();
 		__HAL_RCC_GPIOD_CLK_ENABLE();
@@ -250,9 +251,9 @@ static void FIFO_GPIO_Config(void)
 
     /*(FIFO_DATA--FIFO输出数据)*/
 		GPIO_InitStructure.Pin = 	OV7725_DATA_0_GPIO_PIN | OV7725_DATA_1_GPIO_PIN |
-																			OV7725_DATA_2_GPIO_PIN | OV7725_DATA_3_GPIO_PIN |
-																			OV7725_DATA_4_GPIO_PIN | 	OV7725_DATA_5_GPIO_PIN |
-																			OV7725_DATA_6_GPIO_PIN | 	OV7725_DATA_7_GPIO_PIN;
+															OV7725_DATA_2_GPIO_PIN | OV7725_DATA_3_GPIO_PIN |
+															OV7725_DATA_4_GPIO_PIN | 	OV7725_DATA_5_GPIO_PIN |
+															OV7725_DATA_6_GPIO_PIN | 	OV7725_DATA_7_GPIO_PIN;
     GPIO_InitStructure.Mode = GPIO_MODE_INPUT;
 		GPIO_InitStructure.Pull = GPIO_NOPULL; 
     GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
@@ -283,7 +284,7 @@ static void VSYNC_GPIO_Config(void)
     
 		/*初始化引脚*/
 		GPIO_InitStructure.Pin =  OV7725_VSYNC_GPIO_PIN;
-    GPIO_InitStructure.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStructure.Mode = GPIO_MODE_IT_RISING;
 		GPIO_InitStructure.Pull = GPIO_NOPULL;
     GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
 	  HAL_GPIO_Init(OV7725_VSYNC_GPIO_PORT, &GPIO_InitStructure);

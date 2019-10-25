@@ -39,7 +39,12 @@
 #include "main.h"
 #include "stm32f1xx_it.h"
 #include "./usart/bsp_debug_usart.h"
+#include "./ov7725/bsp_ov7725.h"
+#include "./systick/bsp_SysTick.h" 
 
+extern uint8_t Ov7725_vsync;
+extern unsigned int Task_Delay[];
+extern void TimingDelay_Decrement(void);
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
   */
@@ -154,7 +159,18 @@ void PendSV_Handler(void)
   */
 void SysTick_Handler(void)
 {
-  HAL_IncTick();
+  unsigned char i;
+//	HAL_IncTick();
+	TimingDelay_Decrement();  
+	TimeStamp_Increment(); 
+	
+	for(i=0;i<NumOfTask;i++)
+	{
+		if(Task_Delay[i])
+		{
+			Task_Delay[i]--;
+		}
+	}
 }
 
 /******************************************************************************/
@@ -186,6 +202,29 @@ void  DEBUG_USART_IRQHandler(void)
     WRITE_REG(UartHandle.Instance->DR,ch); 
  
 	}
+}
+
+/* ov7725 场中断 服务程序 */
+void OV7725_VSYNC_EXTI_INT_FUNCTION ( void )
+{
+    if ( __HAL_GPIO_EXTI_GET_IT(OV7725_VSYNC_GPIO_PIN) != RESET ) 	
+    {
+        if( Ov7725_vsync == 0 )
+        {
+            FIFO_WRST_L();//拉低使FIFO写(数据from摄像头)指针复位
+            FIFO_WE_H();	//拉高使FIFO写允许
+            
+            Ov7725_vsync = 1;	   	
+            FIFO_WE_H(); //使FIFO写允许
+            FIFO_WRST_H();//允许使FIFO写(数据from摄像头)指针运动
+        }
+        else if( Ov7725_vsync == 1 )
+        {
+            FIFO_WE_L(); //拉低使FIFO写暂停
+            Ov7725_vsync = 2;
+        }        
+        __HAL_GPIO_EXTI_CLEAR_IT(OV7725_VSYNC_GPIO_PIN);       
+    }    
 }
 /**
   * @brief  This function handles PPP interrupt request.
