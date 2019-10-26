@@ -1,7 +1,9 @@
 /**
   ******************************************************************************
-  * @file    stm32f1xx_hal_can_ex_legacy.h
+  * @file    stm32f1xx_hal_can_ex.h
   * @author  MCD Application Team
+  * @version V1.1.1
+  * @date    12-May-2017
   * @brief   Header file of CAN HAL Extension module.
   ******************************************************************************
   * @attention
@@ -34,8 +36,8 @@
   */ 
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __STM32F1xx_HAL_CAN_EX_LEGACY_H
-#define __STM32F1xx_HAL_CAN_EX_LEGACY_H
+#ifndef __STM32F1xx_HAL_CAN_EX_H
+#define __STM32F1xx_HAL_CAN_EX_H
 
 #ifdef __cplusplus
  extern "C" {
@@ -139,6 +141,6 @@ typedef struct
 }
 #endif
 
-#endif /* __STM32F1xx_HAL_CAN_EX_LEGACY_H */
+#endif /* __STM32F1xx_HAL_CAN_EX_H */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
