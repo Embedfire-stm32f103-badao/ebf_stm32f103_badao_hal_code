@@ -32,7 +32,7 @@ uint8_t BSP_SD_Init(void)
 { 
   uint8_t state = MSD_OK;
   
-  /*SD设备接口配置 */
+  /* uSD device interface configuration */
   uSdHandle.Instance = SDIO;
 
   uSdHandle.Init.ClockEdge           = SDIO_CLOCK_EDGE_RISING;
@@ -42,7 +42,13 @@ uint8_t BSP_SD_Init(void)
   uSdHandle.Init.HardwareFlowControl = SDIO_HARDWARE_FLOW_CONTROL_DISABLE;
   uSdHandle.Init.ClockDiv            = SDIO_TRANSFER_CLK_DIV;
   
-  /*  SD初始化 */
+//  /* Check if the SD card is plugged in the slot */
+//  if(BSP_SD_IsDetected() != SD_PRESENT)
+//  {
+//    return MSD_ERROR;
+//  }
+  
+  /* Msp SD initialization */
   BSP_SD_MspInit(NULL);
 
   if(HAL_SD_Init(&uSdHandle) != HAL_OK)
@@ -50,9 +56,10 @@ uint8_t BSP_SD_Init(void)
     state = MSD_ERROR;
   }
   
-  /* 配置SD总线宽度 */
+  /* Configure SD Bus width */
   if(state == MSD_OK)
   {
+    /* Enable wide operation */
     if(HAL_SD_ConfigWideBusOperation(&uSdHandle, SDIO_BUS_WIDE_4B) != HAL_OK)
     {
       state = MSD_ERROR;
@@ -72,18 +79,18 @@ uint8_t BSP_SD_Init(void)
   */
 uint8_t BSP_SD_ITConfig(void)
 { 
-  GPIO_InitTypeDef gpioinitstruct = {0};
-  
-  /* Configure Interrupt mode for SD detection pin */ 
-  gpioinitstruct.Mode      = GPIO_MODE_IT_RISING_FALLING;
-  gpioinitstruct.Pull      = GPIO_PULLUP;
-  gpioinitstruct.Speed     = GPIO_SPEED_FREQ_HIGH;
-  gpioinitstruct.Pin       = SD_DETECT_PIN;
-  HAL_GPIO_Init(SD_DETECT_GPIO_PORT, &gpioinitstruct);
-    
-  /* NVIC configuration for SDIO interrupts */
-  HAL_NVIC_SetPriority(SD_DETECT_IRQn, 0xE, 0);
-  HAL_NVIC_EnableIRQ(SD_DETECT_IRQn);
+//  GPIO_InitTypeDef gpioinitstruct = {0};
+//  
+//  /* Configure Interrupt mode for SD detection pin */ 
+//  gpioinitstruct.Mode      = GPIO_MODE_IT_RISING_FALLING;
+//  gpioinitstruct.Pull      = GPIO_PULLUP;
+//  gpioinitstruct.Speed     = GPIO_SPEED_FREQ_HIGH;
+//  gpioinitstruct.Pin       = SD_DETECT_PIN;
+//  HAL_GPIO_Init(SD_DETECT_GPIO_PORT, &gpioinitstruct);
+//    
+//  /* NVIC configuration for SDIO interrupts */
+//  HAL_NVIC_SetPriority(SD_DETECT_IRQn, 0xE, 0);
+//  HAL_NVIC_EnableIRQ(SD_DETECT_IRQn);
   
   return 0;
 }
@@ -97,11 +104,11 @@ uint8_t BSP_SD_IsDetected(void)
   __IO uint8_t status = SD_PRESENT;
 
   /* Check SD card detect pin */
-  if(HAL_GPIO_ReadPin(SD_DETECT_GPIO_PORT, SD_DETECT_PIN) != GPIO_PIN_RESET) 
-  {
-    status = SD_NOT_PRESENT;
-  }
-  
+//  if(HAL_GPIO_ReadPin(SD_DETECT_GPIO_PORT, SD_DETECT_PIN) != GPIO_PIN_RESET) 
+//  {
+//    status = SD_NOT_PRESENT;
+//  }
+//  
   return status;
 }
 
@@ -276,27 +283,43 @@ __weak void BSP_SD_MspInit(void *Params)
 {
   GPIO_InitTypeDef gpioinitstruct = {0};
   
-  /* 使能SDIO时钟 */
+  /* Enable SDIO clock */
   __HAL_RCC_SDIO_CLK_ENABLE();
   
-  /* 使能 DMA2时钟 */
+  /* Enable DMA2 clocks */
   __DMAx_TxRx_CLK_ENABLE();
 
-  /* 使能 GPIO 时钟 */
+  /* Enable GPIOs clock */
   __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOD_CLK_ENABLE();
-  __SD_DETECT_GPIO_CLK_ENABLE();
+//  __SD_DETECT_GPIO_CLK_ENABLE();
   
+  /* Common GPIO configuration */
   gpioinitstruct.Mode      = GPIO_MODE_AF_PP;
   gpioinitstruct.Pull      = GPIO_PULLUP;
   gpioinitstruct.Speed     = GPIO_SPEED_FREQ_HIGH;
   
+  /* GPIOC configuration */
   gpioinitstruct.Pin = GPIO_PIN_8 | GPIO_PIN_9 | GPIO_PIN_10 | GPIO_PIN_11 | GPIO_PIN_12;
    
   HAL_GPIO_Init(GPIOC, &gpioinitstruct);
 
+  /* GPIOD configuration */
   gpioinitstruct.Pin = GPIO_PIN_2;
   HAL_GPIO_Init(GPIOD, &gpioinitstruct);
+
+//  /* SD Card detect pin configuration */
+//  gpioinitstruct.Mode      = GPIO_MODE_INPUT;
+//  gpioinitstruct.Pull      = GPIO_PULLUP;
+//  gpioinitstruct.Speed     = GPIO_SPEED_FREQ_HIGH;
+//  gpioinitstruct.Pin       = SD_DETECT_PIN;
+//  HAL_GPIO_Init(SD_DETECT_GPIO_PORT, &gpioinitstruct);
+    
+//  /* NVIC configuration for SDIO interrupts */
+//  HAL_NVIC_SetPriority(SDIO_IRQn, 0xC, 0);
+//  HAL_NVIC_EnableIRQ(SDIO_IRQn);
+  
+  /* DMA initialization should be done here but , as there is only one channel for RX and TX it is configured and done directly when required*/
 }
 
 /**

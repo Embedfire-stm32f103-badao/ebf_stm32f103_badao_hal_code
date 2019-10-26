@@ -8,7 +8,7 @@
   ******************************************************************************
   * @attention
   *
-  * 实验平台:野火 F103-霸道 STM32 开发板 
+  * 实验平台:野火 F103 STM32 开发板 
   * 论坛    :http://www.firebbs.cn
   * 淘宝    :https://fire-stm32.taobao.com
   *
@@ -67,6 +67,7 @@ int main(void)
 	} 
 }
 
+
 /**
   * @brief  System Clock Configuration
   *         The system Clock is configured as follow : 
@@ -77,9 +78,9 @@ int main(void)
   *            APB1 Prescaler                 = 2
   *            APB2 Prescaler                 = 1
   *            HSE Frequency(Hz)              = 8000000
-  *            HSE PREDIV1                    = 2
+  *            HSE PREDIV1                    = 1
   *            PLLMUL                         = 9
-  *            Flash Latency(WS)              = 0
+  *            Flash Latency(WS)              = 2
   * @param  None
   * @retval None
   */
@@ -91,7 +92,7 @@ void SystemClock_Config(void)
   /* Enable HSE Oscillator and activate PLL with HSE as source */
   oscinitstruct.OscillatorType  = RCC_OSCILLATORTYPE_HSE;
   oscinitstruct.HSEState        = RCC_HSE_ON;
-  oscinitstruct.HSEPredivValue  = RCC_HSE_PREDIV_DIV1;
+  oscinitstruct.HSEPredivValue  = RCC_HSE_PREDIV_DIV2;
   oscinitstruct.PLL.PLLState    = RCC_PLL_ON;
   oscinitstruct.PLL.PLLSource   = RCC_PLLSOURCE_HSE;
   oscinitstruct.PLL.PLLMUL      = RCC_PLL_MUL9;
@@ -108,7 +109,7 @@ void SystemClock_Config(void)
   clkinitstruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
   clkinitstruct.APB2CLKDivider = RCC_HCLK_DIV1;
   clkinitstruct.APB1CLKDivider = RCC_HCLK_DIV2;  
-  if (HAL_RCC_ClockConfig(&clkinitstruct, FLASH_LATENCY_2)!= HAL_OK)
+  if (HAL_RCC_ClockConfig(&clkinitstruct, FLASH_LATENCY_0)!= HAL_OK)
   {
     /* Initialization Error */
     while(1); 

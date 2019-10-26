@@ -19,11 +19,11 @@
 #define  SD_TRANSFER_OK                ((uint8_t)0x00)
 #define  SD_TRANSFER_BUSY              ((uint8_t)0x01)
 
-#define SD_DETECT_PIN                    GPIO_PIN_11
-#define SD_DETECT_GPIO_PORT              GPIOF
-#define __SD_DETECT_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOF_CLK_ENABLE()
-#define SD_DETECT_IRQn                   EXTI15_10_IRQn
-   
+//#define SD_DETECT_PIN                    GPIO_PIN_11
+//#define SD_DETECT_GPIO_PORT              GPIOF
+//#define __SD_DETECT_GPIO_CLK_ENABLE()    __HAL_RCC_GPIOF_CLK_ENABLE()
+//#define SD_DETECT_IRQn                   EXTI15_10_IRQn
+  
 #define SD_DATATIMEOUT           100000000U
 
 #define SD_PRESENT               ((uint8_t)0x01)
