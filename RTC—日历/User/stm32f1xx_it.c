@@ -39,7 +39,7 @@
 #include "main.h"
 #include "stm32f1xx_it.h"
 #include "./usart/bsp_debug_usart.h"
-
+#include "./rtc/bsp_rtc.h"
 /** @addtogroup STM32F4xx_HAL_Examples
   * @{
   */
@@ -186,6 +186,11 @@ void  DEBUG_USART_IRQHandler(void)
     WRITE_REG(UartHandle.Instance->DR,ch); 
  
 	}
+}
+
+void RTC_Alarm_IRQHandler(void)
+{
+  HAL_RTC_AlarmIRQHandler(&Rtc_Handle);
 }
 /**
   * @brief  This function handles PPP interrupt request.

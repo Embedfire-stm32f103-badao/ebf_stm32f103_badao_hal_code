@@ -51,32 +51,41 @@ int main(void)
   ILI9341_GramScan ( 6 );
   /*=========================液晶初始化结束===============================*/
 #endif	
- /*##-1- Configure the RTC peripheral #######################################*/
-  /*配置RTC预分频器和RTC数据寄存器 */
-  /*Asynch Prediv  = 由HAL自动计算 */
-  Rtc_Handle.Instance = RTC; 
-  Rtc_Handle.Init.AsynchPrediv = RTC_AUTO_1_SECOND;
 
-	 if (HAL_RTC_Init(&Rtc_Handle) != HAL_OK)
-  {
-    /* Initialization Error */
-    printf("\r\n RTC初始化失败\r\n");;
-  }
-  else
+ 	/*
+	* 当我们配置过RTC时间之后就往备份寄存器0写入一个数据做标记
+	* 所以每次程序重新运行的时候就通过检测备份寄存器0的值来判断
+	* RTC 是否已经配置过，如果配置过那就继续运行，如果没有配置过
+	* 就初始化RTC，配置RTC的时间。
+	*/
+
+	/* RTC配置：选择时钟源，设置RTC_CLK的分频系数 */
+	RTC_CLK_Config();
+
+	if (HAL_RTCEx_BKUPRead(&Rtc_Handle,RTC_BKP_DRX) != RTC_BKP_DATA)
+	{				
+		/* 设置时间和日期 */
+		RTC_TimeAndDate_Set();
+	}
+	else
 	{
-    RTC_CalendarConfig();
 		/* 检查是否电源复位 */
 		if (__HAL_RCC_GET_FLAG(RCC_FLAG_PORRST) != RESET)
 		{
-		  printf("\r\n 发生电源复位....\r\n");
+			printf("\r\n 发生电源复位....\r\n");
 		}
 		/* 检查是否外部复位 */
 		else if (__HAL_RCC_GET_FLAG(RCC_FLAG_PINRST) != RESET)
 		{
-		  printf("\r\n 发生外部复位....\r\n");
+			printf("\r\n 发生外部复位....\r\n");
 		}
-		/* Clear source Reset Flag */
-    __HAL_RCC_CLEAR_RESET_FLAGS();
+		printf("\r\n 不需要重新配置RTC....\r\n");    
+		/* 使能 PWR 时钟 */
+		__HAL_RCC_RTC_ENABLE();
+		/* PWR_CR:DBF置1，使能RTC、RTC备份寄存器和备份SRAM的访问 */
+		HAL_PWR_EnableBkUpAccess();
+		/* 等待 RTC APB 寄存器同步 */
+		HAL_RTC_WaitForSynchro(&Rtc_Handle);
 	} 
 	/* 显示时间和日期 */
 	RTC_TimeAndDate_Show();

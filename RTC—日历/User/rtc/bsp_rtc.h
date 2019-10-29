@@ -10,7 +10,10 @@
 extern RTC_HandleTypeDef Rtc_Handle;
 // 时钟源宏定义
 #define RTC_CLOCK_SOURCE_LSE      
-//#define RCC_OSCILLATORTYPE_LSI  
+//#define RTC_CLOCK_SOURCE_LSI  
+
+
+
  
 #define HOURS                     0x12          // 0~23
 #define MINUTES                   0x12          // 0~59
@@ -26,10 +29,9 @@ extern RTC_HandleTypeDef Rtc_Handle;
 // 备份域寄存器宏定义
 #define RTC_BKP_DRX          RTC_BKP_DR1
 // 写入到备份寄存器的数据宏定义
-#define RTC_BKP_DATA         0X32F2 
-                                  
-void RTC_CalendarConfig(void);
+#define RTC_BKP_DATA         0xA5A5
+void RTC_CLK_Config(void);
+void RTC_TimeAndDate_Set(void);
 void RTC_TimeAndDate_Show(void);
-void HAL_RTC_MspInit(RTC_HandleTypeDef *hrtc);
-
+void RTC_AlarmSet(void);
 #endif /* __XXX_H */
