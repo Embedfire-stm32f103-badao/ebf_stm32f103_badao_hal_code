@@ -122,7 +122,7 @@ static void CAN_Filter_Config(void)
 	CAN_FilterConfTypeDef  CAN_FilterInitStructure;
 
 	/*CAN筛选器初始化*/
-	CAN_FilterInitStructure.FilterNumber=14;						//筛选器组0
+	CAN_FilterInitStructure.FilterNumber=0;						//筛选器组0
 	CAN_FilterInitStructure.FilterMode=CAN_FILTERMODE_IDMASK;	//工作在掩码模式
 	CAN_FilterInitStructure.FilterScale=CAN_FILTERSCALE_32BIT;	//筛选器位宽为单个32位。
 	/* 使能筛选器，按照标志的内容进行比对筛选，扩展ID不是如下的就抛弃掉，是的话，会存入FIFO0。 */
@@ -131,11 +131,14 @@ static void CAN_Filter_Config(void)
 										 CAN_ID_EXT|CAN_RTR_DATA)&0xFFFF0000)>>16;		//要筛选的ID高位 
 	CAN_FilterInitStructure.FilterIdLow= (((uint32_t)0x1314<<3)|
 									     CAN_ID_EXT|CAN_RTR_DATA)&0xFFFF; //要筛选的ID低位 
-	CAN_FilterInitStructure.FilterMaskIdHigh= 0xFFFF;			//筛选器高16位每位必须匹配
-	CAN_FilterInitStructure.FilterMaskIdLow= 0xFFFF;			//筛选器低16位每位必须匹配
+	CAN_FilterInitStructure.FilterMaskIdHigh= 0x0;//FFFF;			//筛选器高16位每位必须匹配
+	CAN_FilterInitStructure.FilterMaskIdLow= 0x0;//FFFF;			//筛选器低16位每位必须匹配
 	CAN_FilterInitStructure.FilterFIFOAssignment=CAN_FILTER_FIFO0 ;	//筛选器被关联到FIFO0
 	CAN_FilterInitStructure.FilterActivation=ENABLE;			//使能筛选器
-	HAL_CAN_ConfigFilter(&Can_Handle,&CAN_FilterInitStructure);
+	if(HAL_CAN_ConfigFilter(&Can_Handle,&CAN_FilterInitStructure) != HAL_OK)
+	{
+		printf("CAN ConfigFilter error!");
+	}
 }
 
 
@@ -153,7 +156,10 @@ void CAN_Config(void)
   CAN_Mode_Config();
   CAN_Filter_Config();
   Init_RxMes(); 
-  HAL_CAN_Receive_IT(&Can_Handle, CAN_FIFO0); 	  
+  if(HAL_CAN_Receive_IT(&Can_Handle, CAN_FIFO0) != HAL_OK)
+	{
+		printf("CAN Receive IT error!");
+	} 	  
 }
 
 
@@ -169,7 +175,7 @@ void Init_RxMes(void)
   /*把接收结构体清零*/
   Can_Handle.pRxMsg->StdId = 0x00;
   Can_Handle.pRxMsg->ExtId = 0x1314;
-  Can_Handle.pRxMsg->IDE = CAN_ID_STD;
+  Can_Handle.pRxMsg->IDE = CAN_ID_EXT;
   Can_Handle.pRxMsg->DLC = 0;
   Can_Handle.pRxMsg->FMI = 0;
   for (ubCounter = 0; ubCounter < 8; ubCounter++)
