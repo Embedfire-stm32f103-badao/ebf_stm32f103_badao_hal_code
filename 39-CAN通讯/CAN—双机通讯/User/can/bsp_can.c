@@ -122,17 +122,19 @@ static void CAN_Filter_Config(void)
 	CAN_FilterConfTypeDef  CAN_FilterInitStructure;
 
 	/*CAN筛选器初始化*/
-	CAN_FilterInitStructure.FilterNumber=0;						//筛选器组0
-	CAN_FilterInitStructure.FilterMode=CAN_FILTERMODE_IDMASK;	  //工作在掩码模式
-	CAN_FilterInitStructure.FilterScale=CAN_FILTERSCALE_32BIT;	//筛选器位宽为单个32位。  
-	
-  /* 使能筛选器，按照标志的内容进行比对筛选，扩展ID不是如下的就抛弃掉，是的话，会存入FIFO0。 */
-	CAN_FilterInitStructure.FilterIdHigh= 0; //要筛选的ID高位 
-	CAN_FilterInitStructure.FilterIdLow= 0;       //要筛选的ID低位 
-	CAN_FilterInitStructure.FilterMaskIdHigh= 0;			      //筛选器高16位每位必须匹配
-	CAN_FilterInitStructure.FilterMaskIdLow= 0;			      //筛选器低16位每位必须匹配
+	CAN_FilterInitStructure.FilterNumber=14;						//筛选器组0
+	CAN_FilterInitStructure.FilterMode=CAN_FILTERMODE_IDMASK;	//工作在掩码模式
+	CAN_FilterInitStructure.FilterScale=CAN_FILTERSCALE_32BIT;	//筛选器位宽为单个32位。
+	/* 使能筛选器，按照标志的内容进行比对筛选，扩展ID不是如下的就抛弃掉，是的话，会存入FIFO0。 */
+
+	CAN_FilterInitStructure.FilterIdHigh= ((((uint32_t)0x1314<<3)|
+										 CAN_ID_EXT|CAN_RTR_DATA)&0xFFFF0000)>>16;		//要筛选的ID高位 
+	CAN_FilterInitStructure.FilterIdLow= (((uint32_t)0x1314<<3)|
+									     CAN_ID_EXT|CAN_RTR_DATA)&0xFFFF; //要筛选的ID低位 
+	CAN_FilterInitStructure.FilterMaskIdHigh= 0xFFFF;			//筛选器高16位每位必须匹配
+	CAN_FilterInitStructure.FilterMaskIdLow= 0xFFFF;			//筛选器低16位每位必须匹配
 	CAN_FilterInitStructure.FilterFIFOAssignment=CAN_FILTER_FIFO0 ;	//筛选器被关联到FIFO0
-	CAN_FilterInitStructure.FilterActivation=ENABLE;			      //使能筛选器
+	CAN_FilterInitStructure.FilterActivation=ENABLE;			//使能筛选器
 	HAL_CAN_ConfigFilter(&Can_Handle,&CAN_FilterInitStructure);
 }
 
@@ -166,7 +168,7 @@ void Init_RxMes(void)
 
   /*把接收结构体清零*/
   Can_Handle.pRxMsg->StdId = 0x00;
-  Can_Handle.pRxMsg->ExtId = 0x00;
+  Can_Handle.pRxMsg->ExtId = 0x1314;
   Can_Handle.pRxMsg->IDE = CAN_ID_STD;
   Can_Handle.pRxMsg->DLC = 0;
   Can_Handle.pRxMsg->FMI = 0;
@@ -175,46 +177,30 @@ void Init_RxMes(void)
     Can_Handle.pRxMsg->Data[ubCounter] = 0x00;
   }
 }
-/**
-  * @brief  CAN接收完成中断(非阻塞) 
-  * @param  hcan: CAN句柄指针
-  * @retval 无
-  */
 
-void HAL_CAN_RxCpltCallback(CAN_HandleTypeDef* hcan)
-{
-  unsigned int i = 0;
-	Message RxMSG ;
-	RxMSG.cob_id = (uint16_t)(Can_Handle.pRxMsg->StdId);
-  if( Can_Handle.pRxMsg->RTR == CAN_RTR_REMOTE )
+/*
+ * 函数名：CAN_SetMsg
+ * 描述  ：CAN通信报文内容设置,设置一个数据内容为0-7的数据包
+ * 输入  ：发送报文结构体
+ * 输出  : 无
+ * 调用  ：外部调用
+ */	 
+void CAN_SetMsg(void)
+{	  
+  uint8_t ubCounter = 0;
+  Can_Handle.pTxMsg->StdId=0x00;						 
+  Can_Handle.pTxMsg->ExtId=0x1314;					 //使用的扩展ID
+  Can_Handle.pTxMsg->IDE=CAN_ID_EXT;				  //扩展模式
+  Can_Handle.pTxMsg->RTR=CAN_RTR_DATA;				 //发送的是数据
+  Can_Handle.pTxMsg->DLC=8;							 //数据长度为8字节
+	
+  /*设置要发送的数据0-7*/
+  for (ubCounter = 0; ubCounter < 8; ubCounter++)
   {
-     RxMSG.rtr = 1;    
+    Can_Handle.pTxMsg->Data[ubCounter] = ubCounter;
   }
-  else
-  {
-      RxMSG.rtr = 0; 
-  }  
-	RxMSG.len = Can_Handle.pRxMsg->DLC;
-	for(i=0;i<RxMSG.len;i++)
-	{
-		RxMSG.data[i] = Can_Handle.pRxMsg->Data[i];
-    printf("Slave RxMSG.data[%d]=%x\n",i,RxMSG.data[i]);
-	}
-	printf("can slaver receive data!\n");
-	canDispatch(&TestSlave_Data, &(RxMSG)); 
-	/* 准备中断接收 */
-	HAL_CAN_Receive_IT(&Can_Handle, CAN_FIFO0);
 }
 
-/**
-  * @brief  CAN错误回调函数
-  * @param  hcan: CAN句柄指针
-  * @retval 无
-  */
-void HAL_CAN_ErrorCallback(CAN_HandleTypeDef *hcan)
-{
-	printf("\r\nCAN出错\r\n");
-}
 
 /**************************END OF FILE************************************/
 
