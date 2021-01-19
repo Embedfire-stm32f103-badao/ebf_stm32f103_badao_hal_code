@@ -67,7 +67,7 @@ int main(void)
   
 	printf("\r\n这是一个8M串行flash(W25Q64)实验(SPI驱动) \r\n");
 	
-  /* 16M串行flash W25Q64初始化 */
+  /* 8M串行flash W25Q64初始化 */
 	SPI_FLASH_Init();
 		/* 获取 Flash Device ID */
 	DeviceID = SPI_FLASH_ReadDeviceID();
@@ -82,7 +82,7 @@ int main(void)
 	/* 检验 SPI Flash ID */
 	if (FlashID == sFLASH_ID) 
 	{	
-		printf("\r\n检测到SPI FLASH W25Q128 !\r\n");
+		printf("\r\n检测到SPI FLASH W25Q64 !\r\n");
 		
 		/* 擦除将要写入的 SPI FLASH 扇区，FLASH写入前要先擦除 */
 		SPI_FLASH_SectorErase(FLASH_SectorToErase);	 	 
