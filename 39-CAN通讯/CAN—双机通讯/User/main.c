@@ -61,7 +61,8 @@ int main(void)
 			/* 开始发送数据 */
 			HAL_CAN_Transmit_IT(&Can_Handle);
 			HAL_Delay(100);
-			LED_RGBOFF;			
+			LED_RGBOFF;		
+
 		}
 		if(flag==1)
 		{				

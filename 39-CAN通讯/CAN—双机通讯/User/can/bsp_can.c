@@ -30,22 +30,33 @@ CanRxMsgTypeDef RxMessage;		//接收缓冲区
  */
 static void CAN_GPIO_Config(void)
 {
- 	GPIO_InitTypeDef GPIO_InitStructure;   	
+ 	GPIO_InitTypeDef GPIO_InitStruct;   	
   
-  /* 使能引脚时钟 */
-  CAN_TX_GPIO_CLK_ENABLE();
-  CAN_RX_GPIO_CLK_ENABLE();	
+  /* USER CODE BEGIN CAN1_MspInit 0 */
 
-  /* 配置CAN发送引脚 */
-  GPIO_InitStructure.Pin = CAN_TX_PIN;
-  GPIO_InitStructure.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStructure.Speed = GPIO_SPEED_FREQ_HIGH;
-  GPIO_InitStructure.Pull  = GPIO_PULLUP;
-  HAL_GPIO_Init(CAN_TX_GPIO_PORT, &GPIO_InitStructure);
+  /* USER CODE END CAN1_MspInit 0 */
+    /* CAN1 clock enable */
+    __HAL_RCC_CAN1_CLK_ENABLE();
 
-  /* 配置CAN接收引脚 */
-  GPIO_InitStructure.Pin = CAN_RX_PIN ;
-  HAL_GPIO_Init(CAN_RX_GPIO_PORT, &GPIO_InitStructure);
+    __HAL_RCC_GPIOB_CLK_ENABLE();
+	
+	  __HAL_RCC_AFIO_CLK_ENABLE();
+
+    /**CAN GPIO Configuration
+    PB8     ------> CAN_RX
+    PB9     ------> CAN_TX
+    */
+    GPIO_InitStruct.Pin = GPIO_PIN_8;
+    GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+    GPIO_InitStruct.Pull = GPIO_NOPULL;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    GPIO_InitStruct.Pin = GPIO_PIN_9;
+    GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
+    GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_HIGH;
+    HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+
+    __HAL_AFIO_REMAP_CAN1_2();
 }
 
 /*
@@ -88,7 +99,7 @@ static void CAN_Mode_Config(void)
 	Can_Handle.Init.RFLM=DISABLE;			   //MCR-RFLM  接收FIFO 锁定模式  DISABLE-溢出时新报文会覆盖原有报文  
 	Can_Handle.Init.TXFP=DISABLE;			   //MCR-TXFP  发送FIFO优先级 DISABLE-优先级取决于报文标示符 
 	Can_Handle.Init.Mode = CAN_MODE_NORMAL;  //正常工作模式
-	Can_Handle.Init.SJW=CAN_SJW_2TQ;		   //BTR-SJW 重新同步跳跃宽度 2个时间单元
+	Can_Handle.Init.SJW=CAN_SJW_1TQ;		   //BTR-SJW 重新同步跳跃宽度 2个时间单元
 	 
 	/* ss=1 bs1=5 bs2=3 位时间宽度为(1+5+3) 波特率即为时钟周期tq*(1+3+5)  */
 	Can_Handle.Init.BS1=CAN_BS1_5TQ;		   //BTR-TS1 时间段1 占用了5个时间单元
@@ -112,19 +123,22 @@ static void CAN_Filter_Config(void)
 
 	/*CAN筛选器初始化*/
 	CAN_FilterInitStructure.FilterNumber=0;						//筛选器组0
-	CAN_FilterInitStructure.FilterMode=CAN_FILTERMODE_IDMASK;	  //工作在掩码模式
-	CAN_FilterInitStructure.FilterScale=CAN_FILTERSCALE_32BIT;	//筛选器位宽为单个32位。  
-	
-  /* 使能筛选器，按照标志的内容进行比对筛选，扩展ID不是如下的就抛弃掉，是的话，会存入FIFO0。 */
+	CAN_FilterInitStructure.FilterMode=CAN_FILTERMODE_IDMASK;	//工作在掩码模式
+	CAN_FilterInitStructure.FilterScale=CAN_FILTERSCALE_32BIT;	//筛选器位宽为单个32位。
+	/* 使能筛选器，按照标志的内容进行比对筛选，扩展ID不是如下的就抛弃掉，是的话，会存入FIFO0。 */
+
 	CAN_FilterInitStructure.FilterIdHigh= ((((uint32_t)0x1314<<3)|
-										 CAN_ID_EXT|CAN_RTR_DATA)&0xFFFF0000)>>16; //要筛选的ID高位 
+										 CAN_ID_EXT|CAN_RTR_DATA)&0xFFFF0000)>>16;		//要筛选的ID高位 
 	CAN_FilterInitStructure.FilterIdLow= (((uint32_t)0x1314<<3)|
-									     CAN_ID_EXT|CAN_RTR_DATA)&0xFFFF;       //要筛选的ID低位 
-	CAN_FilterInitStructure.FilterMaskIdHigh= 0xFFFF;			      //筛选器高16位每位必须匹配
-	CAN_FilterInitStructure.FilterMaskIdLow= 0xFFFF;			      //筛选器低16位每位必须匹配
+									     CAN_ID_EXT|CAN_RTR_DATA)&0xFFFF; //要筛选的ID低位 
+	CAN_FilterInitStructure.FilterMaskIdHigh= 0x0;//FFFF;			//筛选器高16位每位必须匹配
+	CAN_FilterInitStructure.FilterMaskIdLow= 0x0;//FFFF;			//筛选器低16位每位必须匹配
 	CAN_FilterInitStructure.FilterFIFOAssignment=CAN_FILTER_FIFO0 ;	//筛选器被关联到FIFO0
-	CAN_FilterInitStructure.FilterActivation=ENABLE;			      //使能筛选器
-	HAL_CAN_ConfigFilter(&Can_Handle,&CAN_FilterInitStructure);
+	CAN_FilterInitStructure.FilterActivation=ENABLE;			//使能筛选器
+	if(HAL_CAN_ConfigFilter(&Can_Handle,&CAN_FilterInitStructure) != HAL_OK)
+	{
+		printf("CAN ConfigFilter error!");
+	}
 }
 
 
@@ -142,7 +156,10 @@ void CAN_Config(void)
   CAN_Mode_Config();
   CAN_Filter_Config();
   Init_RxMes(); 
-  HAL_CAN_Receive_IT(&Can_Handle, CAN_FIFO0); 	  
+  if(HAL_CAN_Receive_IT(&Can_Handle, CAN_FIFO0) != HAL_OK)
+	{
+		printf("CAN Receive IT error!");
+	} 	  
 }
 
 
@@ -157,8 +174,8 @@ void Init_RxMes(void)
 
   /*把接收结构体清零*/
   Can_Handle.pRxMsg->StdId = 0x00;
-  Can_Handle.pRxMsg->ExtId = 0x00;
-  Can_Handle.pRxMsg->IDE = CAN_ID_STD;
+  Can_Handle.pRxMsg->ExtId = 0x1314;
+  Can_Handle.pRxMsg->IDE = CAN_ID_EXT;
   Can_Handle.pRxMsg->DLC = 0;
   Can_Handle.pRxMsg->FMI = 0;
   for (ubCounter = 0; ubCounter < 8; ubCounter++)
@@ -166,7 +183,6 @@ void Init_RxMes(void)
     Can_Handle.pRxMsg->Data[ubCounter] = 0x00;
   }
 }
-
 
 /*
  * 函数名：CAN_SetMsg
@@ -179,9 +195,9 @@ void CAN_SetMsg(void)
 {	  
   uint8_t ubCounter = 0;
   Can_Handle.pTxMsg->StdId=0x00;						 
-  Can_Handle.pTxMsg->ExtId=0x1314;			 //使用的扩展ID
-  Can_Handle.pTxMsg->IDE=CAN_ID_EXT;		 //扩展模式
-  Can_Handle.pTxMsg->RTR=CAN_RTR_DATA;	 //发送的是数据
+  Can_Handle.pTxMsg->ExtId=0x1314;					 //使用的扩展ID
+  Can_Handle.pTxMsg->IDE=CAN_ID_EXT;				  //扩展模式
+  Can_Handle.pTxMsg->RTR=CAN_RTR_DATA;				 //发送的是数据
   Can_Handle.pTxMsg->DLC=8;							 //数据长度为8字节
 	
   /*设置要发送的数据0-7*/
@@ -190,6 +206,7 @@ void CAN_SetMsg(void)
     Can_Handle.pTxMsg->Data[ubCounter] = ubCounter;
   }
 }
+
 
 /**************************END OF FILE************************************/
 

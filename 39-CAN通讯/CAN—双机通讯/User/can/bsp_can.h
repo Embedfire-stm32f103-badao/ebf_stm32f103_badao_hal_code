@@ -70,9 +70,9 @@ void CAN_SetMsg(void);
 void Init_RxMes(void);
 
 extern CAN_HandleTypeDef Can_Handle;
+
 extern CanTxMsgTypeDef TxMessage;		//发送缓冲区
-extern CanRxMsgTypeDef RxMessage;		//接收缓冲区                                       
-                                                                             
+extern CanRxMsgTypeDef RxMessage;		//接收缓冲区                                                                                                 
 #endif
 
 
