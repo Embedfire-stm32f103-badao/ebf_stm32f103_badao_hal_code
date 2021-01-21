@@ -4,7 +4,7 @@
   * @author  fire
   * @version V1.0
   * @date    2013-xx-xx
-  * @brief   测试lcd
+  * @brief   PWM测试
   ******************************************************************************
   * @attention
   *
@@ -37,11 +37,7 @@ int main(void)
   
   printf("\r\nPWM波输出实验\r\n");
     
-	ADVANCE_TIM_Mode_Config();
-  /* 启动通道PWM输出 */
-  HAL_TIM_PWM_Start(&TIM_TimeBaseStructure,TIM_CHANNEL_1);
-  /* 启动定时器互补通道PWM输出 */
-  HAL_TIMEx_PWMN_Start(&TIM_TimeBaseStructure,TIM_CHANNEL_1);
+	TIMx_Configuration();
   /* 无限循环 */
   while (1)
   {
