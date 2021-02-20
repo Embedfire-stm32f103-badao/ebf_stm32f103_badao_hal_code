@@ -20,7 +20,7 @@
 #include "stm32f1xx.h"
 #include "./usart/bsp_debug_usart.h"
 #include "./led/bsp_led.h"  
-#include "./sdram/bsp_sdram.h"
+#include "./sram/bsp_sram.h"
 #include <stdlib.h>
 #include "./led/bsp_led.h" 
   

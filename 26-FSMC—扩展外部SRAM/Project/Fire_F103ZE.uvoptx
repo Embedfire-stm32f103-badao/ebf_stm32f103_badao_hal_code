@@ -103,7 +103,7 @@
         <bEvRecOn>1</bEvRecOn>
         <bSchkAxf>0</bSchkAxf>
         <bTchkAxf>0</bTchkAxf>
-        <nTsel>2</nTsel>
+        <nTsel>3</nTsel>
         <sDll></sDll>
         <sDllPa></sDllPa>
         <sDlgDll></sDlgDll>
@@ -826,8 +826,8 @@
       <tvExp>0</tvExp>
       <tvExpOptDlg>0</tvExpOptDlg>
       <bDave2>0</bDave2>
-      <PathWithFileName>..\User\sdram\bsp_sdram.c</PathWithFileName>
-      <FilenameWithoutPath>bsp_sdram.c</FilenameWithoutPath>
+      <PathWithFileName>..\User\sram\bsp_sram.c</PathWithFileName>
+      <FilenameWithoutPath>bsp_sram.c</FilenameWithoutPath>
       <RteFlg>0</RteFlg>
       <bShared>0</bShared>
     </File>

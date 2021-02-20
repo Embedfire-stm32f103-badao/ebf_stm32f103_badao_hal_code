@@ -1,6 +1,6 @@
 /**
   ******************************************************************************
-  * @file    bsp_sdram.c
+  * @file    bsp_sram.c
   * @author  fire
   * @version V1.0
   * @date    2015-xx-xx
@@ -15,7 +15,7 @@
   ******************************************************************************
   */
   
-#include "./sdram/bsp_sdram.h"  
+#include "./sram/bsp_sram.h"  
 
 static SRAM_HandleTypeDef  SRAM_Handler;
 static FSMC_NORSRAM_TimingTypeDef Timing;
@@ -82,9 +82,9 @@ static FSMC_NORSRAM_TimingTypeDef Timing;
   */
 void FSMC_SRAM_Init(void)
 { 
-   SRAM_Handler.Instance = FSMC_NORSRAM_DEVICE;
-   SRAM_Handler.Extended = FSMC_NORSRAM_EXTENDED_DEVICE;
-  
+  SRAM_Handler.Instance = FSMC_NORSRAM_DEVICE;
+  SRAM_Handler.Extended = FSMC_NORSRAM_EXTENDED_DEVICE;
+
   /* SRAM device configuration */  
   Timing.AddressSetupTime      = 0x00;
   Timing.AddressHoldTime       = 0x00;
@@ -95,18 +95,18 @@ void FSMC_SRAM_Init(void)
   Timing.AccessMode            = FSMC_ACCESS_MODE_A;
  
   SRAM_Handler.Init.NSBank=FSMC_NORSRAM_BANK3;     					        //使用NE4
-	SRAM_Handler.Init.DataAddressMux=FSMC_DATA_ADDRESS_MUX_DISABLE; 	//地址/数据线不复用
-	SRAM_Handler.Init.MemoryType=FSMC_MEMORY_TYPE_SRAM;   				    //SRAM
-	SRAM_Handler.Init.MemoryDataWidth=FSMC_NORSRAM_MEM_BUS_WIDTH_16; 	//16位数据宽度
-	SRAM_Handler.Init.BurstAccessMode=FSMC_BURST_ACCESS_MODE_DISABLE; //是否使能突发访问,仅对同步突发存储器有效,此处未用到
-	SRAM_Handler.Init.WaitSignalPolarity=FSMC_WAIT_SIGNAL_POLARITY_LOW;//等待信号的极性,仅在突发模式访问下有用
-	SRAM_Handler.Init.WaitSignalActive=FSMC_WAIT_TIMING_BEFORE_WS;   	//存储器是在等待周期之前的一个时钟周期还是等待周期期间使能NWAIT
-	SRAM_Handler.Init.WriteOperation=FSMC_WRITE_OPERATION_ENABLE;    	//存储器写使能
-	SRAM_Handler.Init.WaitSignal=FSMC_WAIT_SIGNAL_DISABLE;           	//等待使能位,此处未用到
-	SRAM_Handler.Init.ExtendedMode=FSMC_EXTENDED_MODE_DISABLE;        	//读写使用相同的时序
-	SRAM_Handler.Init.AsynchronousWait=FSMC_ASYNCHRONOUS_WAIT_DISABLE;	//是否使能同步传输模式下的等待信号,此处未用到
-	SRAM_Handler.Init.WriteBurst=FSMC_WRITE_BURST_DISABLE;           	  //禁止突发写
-  
+  SRAM_Handler.Init.DataAddressMux=FSMC_DATA_ADDRESS_MUX_DISABLE; 	//地址/数据线不复用
+  SRAM_Handler.Init.MemoryType=FSMC_MEMORY_TYPE_SRAM;   				    //SRAM
+  SRAM_Handler.Init.MemoryDataWidth=FSMC_NORSRAM_MEM_BUS_WIDTH_16; 	//16位数据宽度
+  SRAM_Handler.Init.BurstAccessMode=FSMC_BURST_ACCESS_MODE_DISABLE; //是否使能突发访问,仅对同步突发存储器有效,此处未用到
+  SRAM_Handler.Init.WaitSignalPolarity=FSMC_WAIT_SIGNAL_POLARITY_LOW;//等待信号的极性,仅在突发模式访问下有用
+  SRAM_Handler.Init.WaitSignalActive=FSMC_WAIT_TIMING_BEFORE_WS;   	//存储器是在等待周期之前的一个时钟周期还是等待周期期间使能NWAIT
+  SRAM_Handler.Init.WriteOperation=FSMC_WRITE_OPERATION_ENABLE;    	//存储器写使能
+  SRAM_Handler.Init.WaitSignal=FSMC_WAIT_SIGNAL_DISABLE;           	//等待使能位,此处未用到
+  SRAM_Handler.Init.ExtendedMode=FSMC_EXTENDED_MODE_DISABLE;        	//读写使用相同的时序
+  SRAM_Handler.Init.AsynchronousWait=FSMC_ASYNCHRONOUS_WAIT_DISABLE;	//是否使能同步传输模式下的等待信号,此处未用到
+  SRAM_Handler.Init.WriteBurst=FSMC_WRITE_BURST_DISABLE;           	  //禁止突发写
+
   /* SRAM controller initialization */
   FSMC_SRAM_MspInit();
   HAL_SRAM_Init(& SRAM_Handler, &Timing, &Timing);
