@@ -62,6 +62,7 @@ void _485_Config(void)
   
   /* 配置Rx引脚为复用功能 */
   GPIO_InitStruct.Pin = _485_USART_RX_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_AF_INPUT;
   HAL_GPIO_Init(_485_USART_RX_GPIO_PORT, &GPIO_InitStruct); 
   
  /* 485收发控制管脚 */

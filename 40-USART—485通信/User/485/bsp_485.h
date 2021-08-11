@@ -23,9 +23,9 @@
 
 
 
-#define _485_RE_GPIO_PORT					   GPIOC
+#define _485_RE_GPIO_PORT                      GPIOC
 #define _485_RE_GPIO_CLK_ENABLE()              __HAL_RCC_GPIOC_CLK_ENABLE()
-#define _485_RE_PIN							   GPIO_PIN_0
+#define _485_RE_PIN                            GPIO_PIN_2
 
 #define _485_INT_IRQ                 		   USART2_IRQn
 #define bsp_485_IRQHandler                 USART2_IRQHandler
